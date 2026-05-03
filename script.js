@@ -119,12 +119,12 @@ function openProfile(nick) {
     
     const skinImg = document.getElementById('modalImg');
     
-    // ИСПРАВЛЕНО: Новый роут Crafatar. Он ищет полноценный скин напрямую по нику
-    skinImg.src = `https://surgeplay.com{player.nick}`;
+    // Прямой запрос крупной 2D головы по нику
+    skinImg.src = `https://mc-heads.net{player.nick}/120`;
 
-        skinImg.onerror = function() {
+    skinImg.onerror = function() {
         skinImg.onerror = null;
-        skinImg.src = 'https://surgeplay.com';
+        skinImg.src = 'https://mc-heads.net';
     };
 
     const grid = document.getElementById('modalTiersGrid');
@@ -196,8 +196,7 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <!-- Аватарки в таблице тоже грузятся по нику -->
-                        <img src="https://surgeplay.com{player.nick}" alt="">
+                        <img src="https://mc-heads.net{player.nick}/32" alt="">
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
