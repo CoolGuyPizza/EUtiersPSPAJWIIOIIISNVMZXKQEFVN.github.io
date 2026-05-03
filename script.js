@@ -120,11 +120,11 @@ function openProfile(nick) {
     const skinImg = document.getElementById('modalImg');
     
     // ИСПРАВЛЕНО: Новый роут Crafatar. Он ищет полноценный скин напрямую по нику
-    skinImg.src = `https://crafatar.com{player.nick}?scale=4&default=MHF_Steve`;
+    skinImg.src = `https://surgeplay.com{player.nick}`;
 
-    skinImg.onerror = function() {
+        skinImg.onerror = function() {
         skinImg.onerror = null;
-        skinImg.src = 'https://crafatar.com';
+        skinImg.src = 'https://surgeplay.com';
     };
 
     const grid = document.getElementById('modalTiersGrid');
