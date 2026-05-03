@@ -6,13 +6,15 @@
     <title>MCTIERS</title>
     <!-- Запрещаем поисковикам индексировать сайт -->
     <meta name="robots" content="noindex, nofollow">
+    <!-- Подключаем жирный шрифт Inter как в MCTiers -->
+    <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <!-- НАВИГАЦИЯ (РЕЖИМЫ) -->
     <div class="nav-container" id="modesNav">
-        <!-- Сюда JS вставит кнопки режимов -->
+        <!-- Кнопки режимов -->
     </div>
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
@@ -33,12 +35,12 @@
                 </tr>
             </thead>
             <tbody id="leaderboardBody">
-                <!-- Сюда JS вставит строки игроков -->
+                <!-- Строки игроков -->
             </tbody>
         </table>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ (Открывается на клавишу ` или Ё) -->
+    <!-- АДМИН-ПАНЕЛЬ -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <h3>Панель управления</h3>
         <div class="form-group">
@@ -55,9 +57,7 @@
         </div>
         <div class="form-group">
             <label>Режим:</label>
-            <select id="mode-select">
-                <!-- Сюда JS вставит режимы -->
-            </select>
+            <select id="mode-select"></select>
         </div>
         <div class="form-group">
             <label>Тир:</label>
@@ -75,44 +75,45 @@
                 <option value="NONE">NONE</option>
             </select>
         </div>
-        <!-- ИСПРАВЛЕНО: Добавлен event для правильной работы JS -->
         <button class="admin-btn" onclick="savePlayer(event)">Сохранить / Обновить</button>
         <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Удалить игрока</button>
     </div>
 
-    <!-- PROFILE MODAL (МОДАЛЬНОЕ ОКНО ПРОФИЛЯ) -->
+    <!-- PROFILE MODAL -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
             
             <div class="avatar-container">
-                <!-- ИСПРАВЛЕНО: Маленькая круглая аватарка (лицо) -->
-                <img id="modalAvatar" class="modal-avatar" src="" alt="Avatar">
-                
-                <!-- ИСПРАВЛЕНО: Большой скин в полный рост -->
+                <!-- 3D Скин в полный рост -->
                 <img id="modalImg" class="modal-skin" src="" alt="Skin">
             </div>
 
             <div class="modal-nick" id="modalNick">PlayerName</div>
-            <div class="modal-role" id="modalRole">◆ Rookie</div>
+            
+            <div class="role-wrapper">
+                <div class="modal-role" id="modalRole">Combat Grandmaster</div>
+            </div>
+            
             <div class="modal-region" id="modalRegion">Europe</div>
 
-            <!-- СТАТУС АККАУНТА -->
-            <div id="modalAccountType" style="font-size: 12px; color: #fff; padding: 4px 8px; border-radius: 4px; display: inline-block; margin-top: 5px; background: #30363d;">✔ Статус скрыт</div>
-
-            <div class="modal-section-title">ПОЗИЦИЯ В ТОПЕ</div>
+            <div class="modal-section-title">POSITION</div>
             <div class="modal-box">
-                <span class="modal-rank-num" id="modalRank">1.</span>
-                <span class="modal-rank-title">🏆 OVERALL</span>
-                <div style="font-size: 14px; color: var(--text-gray); font-weight: 700; margin-top: 5px;" id="modalPoints">0 points</div>
+                <div class="modal-box-left">
+                    <span class="modal-rank-num" id="modalRank">1.</span>
+                </div>
+                <div class="modal-box-right">
+                    <span class="modal-rank-title">🏆 OVERALL</span>
+                    <span class="modal-points" id="modalPoints">(0 points)</span>
+                </div>
             </div>
 
             <div class="modal-section-title">TIERS</div>
-            <div class="modal-tiers-container" id="modalTiersGrid"></div>
+            <!-- Сетка тиров как на скрине -->
+            <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
     </div>
 
-    <!-- Подключаем файл со скриптами -->
     <script src="script.js"></script>
 </body>
 </html>
