@@ -63,7 +63,7 @@ function switchMode(mode) {
     renderTable();
 }
 
-// Теперь функция простая и быстрая, без запросов в интернет
+// Теперь функция быстрая, без зависаний и лишних запросов
 function savePlayer(event) {
     if (event) event.preventDefault(); 
     
@@ -119,20 +119,17 @@ function openProfile(nick) {
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
     const skinImg = document.getElementById('modalImg');
+    const avatarImg = document.getElementById('modalAvatar');
     
-    // ИСПОЛЬЗУЕМ MC-HEADS: Он отлично ищет 3D-модель в полный рост прямо по нику!
-    skinImg.src = `https://mc-heads.net{player.nick}`;
+    // ИСПРАВЛЕНО: Visage генерирует большой скин и лицо по нику
+    skinImg.src = `https://surgeplay.com{player.nick}`;
+    avatarImg.src = `https://surgeplay.com{player.nick}`;
 
     skinImg.onerror = function() {
         skinImg.onerror = null;
-        skinImg.src = 'https://mc-heads.net';
+        skinImg.src = 'https://surgeplay.com';
+        avatarImg.src = 'https://surgeplay.com';
     };
-
-    const typeBadge = document.getElementById('modalAccountType');
-    if (typeBadge) {
-        typeBadge.textContent = "✔ Статус скрыт";
-        typeBadge.style.background = "#30363d";
-    }
 
     const grid = document.getElementById('modalTiersGrid');
     grid.innerHTML = '';
@@ -203,8 +200,8 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <!-- Аватарка тоже грузится по нику через mc-heads -->
-                        <img src="https://mc-heads.net{player.nick}/32" alt="">
+                        <!-- Аватарка в таблице тоже грузится по нику через Visage -->
+                        <img src="https://surgeplay.com{player.nick}" alt="">
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points).replace('◆ ', '')} (${points} pts)</span>
