@@ -120,7 +120,7 @@ function openProfile(nick) {
     const skinImg = document.getElementById('modalImg');
     
     // Прямой запрос крупной 2D головы по нику
-    skinImg.src = `https://mc-heads.net{player.nick}/120`;
+    skinImg.src = `default.png`;
 
     skinImg.onerror = function() {
         skinImg.onerror = null;
@@ -196,7 +196,7 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <img src="https://mc-heads.net{player.nick}/32" alt="">
+                        <img src="default.png" alt="">
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
