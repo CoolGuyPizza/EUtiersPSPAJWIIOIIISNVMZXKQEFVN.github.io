@@ -64,7 +64,7 @@ function switchMode(mode) {
     renderTable();
 }
 
-function savePlayer() {
+async function savePlayer() {
     const nick = document.getElementById('nickname').value.trim();
     const mode = document.getElementById('mode-select').value;
     const tier = document.getElementById('tier-select').value;
@@ -72,18 +72,48 @@ function savePlayer() {
     
     if (!nick) { alert('Введите ник!'); return; }
 
-    let player = players.find(p => p.nick.toLowerCase() === nick.toLowerCase());
-    if (!player) {
-        player = { nick: nick, region: region, tiers: {} };
-        modesList.forEach(m => player.tiers[m] = 'NONE');
-        players.push(player);
+    // Блокируем кнопку или показываем статус, так как запрос займет секунду
+    const originalBtnText = document.querySelector('#adminPanel button')?.textContent;
+    console.log("Проверяем игрока...");
+
+    try {
+        // Проверяем существование лицензионного аккаунта через PlayerDB
+        const response = await fetch(`https://playerdb.co{nick}`);
+        const data = await response.json();
+        
+        if (!data.success) {
+            alert('Ошибка: Такого лицензионного аккаунта не существует! Пиратские ники добавлять нельзя.');
+            return;
+        }
+
+        // Если аккаунт найден, вытаскиваем его НАСТОЯЩИЙ ник и уникальный UUID
+        const realNick = data.data.player.username;
+        const uuid = data.data.player.id;
+
+        let player = players.find(p => p.nick.toLowerCase() === realNick.toLowerCase());
+        
+        if (!player) {
+            // Добавляем UUID в базу игрока, чтобы потом по нему грузить скин
+            player = { nick: realNick, uuid: uuid, region: region, tiers: {} };
+            modesList.forEach(m => player.tiers[m] = 'NONE');
+            players.push(player);
+        } else {
+            // Если игрок уже был, просто обновляем его UUID на всякий случай
+            player.uuid = uuid;
+        }
+        
+        player.tiers[mode] = tier;
+        player.region = region;
+        
+        localStorage.setItem('mcTiersData', JSON.stringify(players));
+        document.getElementById('nickname').value = '';
+        renderTable();
+        alert(`Игрок ${realNick} успешно добавлен!`);
+
+    } catch (error) {
+        alert('Ошибка при проверке аккаунта. Попробуйте еще раз.');
+        console.error(error);
     }
-    player.tiers[mode] = tier;
-    player.region = region;
-    
-    localStorage.setItem('mcTiersData', JSON.stringify(players));
-    document.getElementById('nickname').value = '';
-    renderTable();
 }
 
 function deletePlayer(nick) {
@@ -114,36 +144,50 @@ async function openProfile(nick) {
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
     const skinImg = document.getElementById('modalImg');
-    // ИСПРАВЛЕНО: Добавлен знак $ и правильный путь для 3D скина
-    skinImg.src = `https://crafatar.com{player.nick}?scale=4&default=MHF_Steve`;
+    
+    // ИСПРАВЛЕНО: Теперь скин запрашивается по UUID, а не по нику! Так Crafatar сработает на 100%
+    if (player.uuid) {
+        skinImg.src = `https://crafatar.com{player.uuid}?scale=4&default=MHF_Steve`;
+    } else {
+        skinImg.src = `https://crafatar.com`;
+    }
 
     skinImg.onerror = function() {
-        skinImg.onerror = null; // Останавливает бесконечный цикл
+        skinImg.onerror = null;
         skinImg.src = 'https://crafatar.com';
     };
 
+    // Так как мы теперь пускаем ТОЛЬКО лицензии, плашку можно сделать статичной
     const typeBadge = document.getElementById('modalAccountType');
     if (typeBadge) {
-        typeBadge.textContent = "Проверка...";
-        typeBadge.style.background = "#30363d";
-
-        try {
-            // ИСПРАВЛЕНО: Добавлен знак $ и правильный путь к PlayerDB API
-            const response = await fetch(`https://playerdb.co{player.nick}`);
-            const data = await response.json();
-            
-            if (data.success) {
-                typeBadge.textContent = "✔ Premium (Лицензия)";
-                typeBadge.style.background = "#238636";
-            } else {
-                typeBadge.textContent = "✖ Cracked (Пиратка)";
-                typeBadge.style.background = "#da3633";
-            }
-        } catch (error) {
-            typeBadge.textContent = "✖ Cracked (Пиратка)";
-            typeBadge.style.background = "#da3633";
-        }
+        typeBadge.textContent = "✔ Premium (Лицензия)";
+        typeBadge.style.background = "#238636";
     }
+
+    const grid = document.getElementById('modalTiersGrid');
+    grid.innerHTML = '';
+    
+    modesList.forEach(m => {
+        const t = player.tiers[m];
+        if (t !== 'NONE') {
+            const item = document.createElement('div');
+            item.className = 'modal-tier-item';
+            item.innerHTML = `
+                <div class="modal-mode-icon"><img src="${modeIcons[m]}" alt=""></div>
+                <span class="tier-badge ${t}">${t}</span>
+            `;
+            grid.appendChild(item);
+        }
+    });
+    
+    if (grid.innerHTML === '') {
+        grid.innerHTML = '<span style="color: #8b949e; font-size: 14px;">У игрока нет выданных тиров</span>';
+    }
+
+    const overlay = document.getElementById('profileModal');
+    overlay.style.display = 'flex';
+    setTimeout(() => { overlay.classList.add('active'); }, 10);
+}
 
     const grid = document.getElementById('modalTiersGrid');
     grid.innerHTML = '';
@@ -214,7 +258,7 @@ function renderTable() {
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
                         <!-- ИСПРАВЛЕНО: Добавлен знак $ и путь к аватарам -->
-                        <img src="https://crafatar.com{player.nick}?size=32&default=MHF_Steve" alt="">
+                        <img src="https://crafatar.com{player.uuid || 'MHF_Steve'}?size=32&default=MHF_Steve" alt="">
 
                     <div>
                         <span class="player-name">${player.nick}</span>
