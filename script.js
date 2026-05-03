@@ -80,17 +80,18 @@ async function savePlayer(event) {
     saveBtn.disabled = true;
 
     try {
-        const response = await fetch(`https://ashcon.app{nick}`);
+        // Делаем запрос к Minetools API
+        const response = await fetch(`https://minetools.eu{nick}`);
         const data = await response.json();
         
-        if (!data.success) {
+        if (!data.uuid || data.status === "ERR") {
             alert('Ошибка: Такого лицензионного аккаунта не существует!');
             saveBtn.textContent = originalText;
             saveBtn.disabled = false;
             return;
         }
 
-        const realNick = data.username;
+        const realNick = data.name;
         const uuid = data.uuid;
 
         let player = players.find(p => p.nick.toLowerCase() === realNick.toLowerCase());
