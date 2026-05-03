@@ -40,13 +40,13 @@ document.addEventListener('keydown', function(e) {
 });
 
 function getRankTitle(points) {
-    if (points >= 400) return '◆ Combat Grandmaster';
-    if (points >= 250) return '◆ Combat Master';
-    if (points >= 100) return '◆ Combat Ace';
-    if (points >= 50) return '◆ Combat Specialist';
-    if (points >= 20) return '◆ Combat Cadet';
-    if (points >= 10) return '◆ Combat Novice';
-    return '◆ Rookie';
+    if (points >= 400) return 'Combat Grandmaster';
+    if (points >= 250) return 'Combat Master';
+    if (points >= 100) return 'Combat Ace';
+    if (points >= 50) return 'Combat Specialist';
+    if (points >= 20) return 'Combat Cadet';
+    if (points >= 10) return 'Combat Novice';
+    return 'Rookie';
 }
 
 function calculatePlayerPoints(player) {
@@ -63,7 +63,6 @@ function switchMode(mode) {
     renderTable();
 }
 
-// Теперь функция быстрая, без зависаний и лишних запросов
 function savePlayer(event) {
     if (event) event.preventDefault(); 
     
@@ -119,16 +118,13 @@ function openProfile(nick) {
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
     const skinImg = document.getElementById('modalImg');
-    const avatarImg = document.getElementById('modalAvatar');
     
-    // ИСПРАВЛЕНО: Visage генерирует большой скин и лицо по нику
-    skinImg.src = `https://surgeplay.com{player.nick}`;
-    avatarImg.src = `https://surgeplay.com{player.nick}`;
+    // ИСПРАВЛЕНО: Новый роут Crafatar. Он ищет полноценный скин напрямую по нику
+    skinImg.src = `https://crafatar.com{player.nick}?scale=4&default=MHF_Steve`;
 
     skinImg.onerror = function() {
         skinImg.onerror = null;
-        skinImg.src = 'https://surgeplay.com';
-        avatarImg.src = 'https://surgeplay.com';
+        skinImg.src = 'https://crafatar.com';
     };
 
     const grid = document.getElementById('modalTiersGrid');
@@ -148,7 +144,7 @@ function openProfile(nick) {
     });
     
     if (grid.innerHTML === '') {
-        grid.innerHTML = '<span style="color: #8b949e; font-size: 14px;">У игрока нет выданных тиров</span>';
+        grid.innerHTML = '<span style="color: #7b8394; font-size: 13px; font-weight: 700;">У игрока нет выданных тиров</span>';
     }
 
     const overlay = document.getElementById('profileModal');
@@ -159,7 +155,7 @@ function openProfile(nick) {
 function closeModalDirect() {
     const overlay = document.getElementById('profileModal');
     overlay.classList.remove('active');
-    setTimeout(() => { overlay.style.display = 'none'; }, 300);
+    setTimeout(() => { overlay.style.display = 'none'; }, 200);
 }
 
 function closeModal(e) { if (e.target.className.includes('modal-overlay')) { closeModalDirect(); } }
@@ -200,11 +196,11 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <!-- Аватарка в таблице тоже грузится по нику через Visage -->
-                        <img src="https://surgeplay.com{player.nick}" alt="">
+                        <!-- Аватарки в таблице тоже грузятся по нику -->
+                        <img src="https://crafatar.com{player.nick}?size=32&default=MHF_Steve" alt="">
                     <div>
                         <span class="player-name">${player.nick}</span>
-                        <span class="player-title">${getRankTitle(points).replace('◆ ', '')} (${points} pts)</span>
+                        <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
                     </div>
                 </div>
             </td>
