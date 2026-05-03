@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>MCTIERS - Private Replica</title>
+    <!-- Подключаем файл со стилями -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- HEADER -->
+    <div class="header">
+        <div class="logo">MCTIERS</div>
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Поиск игрока..." oninput="renderTable()">
+        </div>
+    </div>
+
+    <!-- NAVIGATION TABS -->
+    <div class="modes-nav" id="modesNav"></div>
+
+    <!-- LEADERBOARD -->
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 40px;">#</th>
+                    <th>ИГРОК</th>
+                    <th style="width: 70px;">РЕГИОН</th>
+                    <th id="tier-header-title">ALL TIERS</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody"></tbody>
+        </table>
+    </div>
+
+    <!-- SECRET ADMIN PANEL -->
+    <div id="adminPanel">
+        <h3>Панель управления</h3>
+        <div class="form-group">
+            <label>Ник в Minecraft:</label>
+            <input type="text" id="nickname" placeholder="Player nick...">
+        </div>
+        <div class="form-group">
+            <label>Регион:</label>
+            <select id="region-select">
+                <option value="EU">EU</option><option value="NA">NA</option>
+                <option value="AS">AS</option><option value="AU">AU</option>
+                <option value="SA">SA</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Режим:</label>
+            <select id="mode-select"></select>
+        </div>
+        <div class="form-group">
+            <label>Тир:</label>
+            <select id="tier-select">
+                <option value="HT1">HT1</option><option value="LT1">LT1</option>
+                <option value="HT2">HT2</option><option value="LT2">LT2</option>
+                <option value="HT3">HT3</option><option value="LT3">LT3</option>
+                <option value="HT4">HT4</option><option value="LT4">LT4</option>
+                <option value="HT5">HT5</option><option value="LT5">LT5</option>
+                <option value="NONE">Без тира / Сбросить</option>
+            </select>
+        </div>
+        <button class="admin-btn" onclick="savePlayer()">Сохранить / Обновить</button>
+        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Удалить игрока</button>
+    </div>
+
+    <!-- PROFILE MODAL -->
+    <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModalDirect()">✕</button>
+            <div class="avatar-container"><img id="modalImg" class="modal-avatar" src="" alt=""></div>
+            <div class="modal-nick" id="modalNick">PlayerName</div>
+            <div class="modal-role" id="modalRole">◆ Rookie</div>
+            <div class="modal-region" id="modalRegion">Europe</div>
+            
+            <div class="modal-section-title">ПОЗИЦИЯ В ТОПЕ</div>
+            <div class="modal-box">
+                <span class="modal-rank-num" id="modalRank">1.</span>
+                <span class="modal-rank-title">🏆 OVERALL</span>
+                <div style="font-size: 14px; color: var(--text-gray); font-weight: 700; margin-top: 5px;" id="modalPoints">0 points</div>
+            </div>
+            
+            <div class="modal-section-title">TIERS</div>
+            <div class="modal-tiers-container" id="modalTiersGrid"></div>
+        </div>
+    </div>
+
+    <!-- Подключаем файл со скриптами -->
+    <script src="script.js"></script>
+</body>
+</html>
