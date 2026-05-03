@@ -197,7 +197,7 @@ function renderTable() {
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
                         <!-- Аватарки в таблице тоже грузятся по нику -->
-                        <img src="https://crafatar.com{player.nick}?size=32&default=MHF_Steve" alt="">
+                        <img src="https://surgeplay.com{player.nick}" alt="">
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
