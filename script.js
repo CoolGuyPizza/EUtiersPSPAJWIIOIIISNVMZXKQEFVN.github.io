@@ -80,7 +80,7 @@ async function savePlayer(event) {
     saveBtn.disabled = true;
 
     try {
-        const response = await fetch(`https://playerdb.co{nick}`);
+        const response = await fetch(`https://ashcon.app{nick}`);
         const data = await response.json();
         
         if (!data.success) {
