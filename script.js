@@ -63,8 +63,8 @@ function switchMode(mode) {
     renderTable();
 }
 
-// ИСПРАВЛЕНО: Добавлен async и отмена стандартного поведения кнопки
-async function savePlayer(event) {
+// Теперь функция простая и быстрая, без запросов в интернет
+function savePlayer(event) {
     if (event) event.preventDefault(); 
     
     const nick = document.getElementById('nickname').value.trim();
@@ -74,51 +74,21 @@ async function savePlayer(event) {
     
     if (!nick) { alert('Введите ник!'); return; }
 
-    const saveBtn = event ? event.target : document.querySelector('#adminPanel button');
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = "Проверка...";
-    saveBtn.disabled = true;
-
-    try {
-        // Делаем запрос к Minetools API
-        const response = await fetch(`https://minetools.eu{nick}`);
-        const data = await response.json();
-        
-        if (!data.uuid || data.status === "ERR") {
-            alert('Ошибка: Такого лицензионного аккаунта не существует!');
-            saveBtn.textContent = originalText;
-            saveBtn.disabled = false;
-            return;
-        }
-
-        const realNick = data.name;
-        const uuid = data.uuid;
-
-        let player = players.find(p => p.nick.toLowerCase() === realNick.toLowerCase());
-        
-        if (!player) {
-            player = { nick: realNick, uuid: uuid, region: region, tiers: {} };
-            modesList.forEach(m => player.tiers[m] = 'NONE');
-            players.push(player);
-        } else {
-            player.uuid = uuid;
-        }
-        
-        player.tiers[mode] = tier;
-        player.region = region;
-        
-        localStorage.setItem('mcTiersData', JSON.stringify(players));
-        document.getElementById('nickname').value = '';
-        renderTable();
-        alert(`Игрок ${realNick} успешно добавлен!`);
-
-    } catch (error) {
-        alert('Ошибка при проверке аккаунта. Попробуйте еще раз.');
-        console.error(error);
-    } finally {
-        saveBtn.textContent = originalText;
-        saveBtn.disabled = false;
+    let player = players.find(p => p.nick.toLowerCase() === nick.toLowerCase());
+    
+    if (!player) {
+        player = { nick: nick, region: region, tiers: {} };
+        modesList.forEach(m => player.tiers[m] = 'NONE');
+        players.push(player);
     }
+    
+    player.tiers[mode] = tier;
+    player.region = region;
+    
+    localStorage.setItem('mcTiersData', JSON.stringify(players));
+    document.getElementById('nickname').value = '';
+    renderTable();
+    alert(`Игрок ${nick} успешно добавлен!`);
 }
 
 function deletePlayer(nick) {
@@ -150,22 +120,18 @@ function openProfile(nick) {
     
     const skinImg = document.getElementById('modalImg');
     
-    // ИСПРАВЛЕНО: Прямой запрос скина по UUID
-    if (player.uuid) {
-        skinImg.src = `https://crafatar.com{player.uuid}?scale=4&default=MHF_Steve`;
-    } else {
-        skinImg.src = `https://crafatar.com`;
-    }
+    // ИСПОЛЬЗУЕМ MC-HEADS: Он отлично ищет 3D-модель в полный рост прямо по нику!
+    skinImg.src = `https://mc-heads.net{player.nick}`;
 
     skinImg.onerror = function() {
         skinImg.onerror = null;
-        skinImg.src = 'https://crafatar.com';
+        skinImg.src = 'https://mc-heads.net';
     };
 
     const typeBadge = document.getElementById('modalAccountType');
     if (typeBadge) {
-        typeBadge.textContent = "✔ Premium (Лицензия)";
-        typeBadge.style.background = "#238636";
+        typeBadge.textContent = "✔ Статус скрыт";
+        typeBadge.style.background = "#30363d";
     }
 
     const grid = document.getElementById('modalTiersGrid');
@@ -237,7 +203,8 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <img src="https://crafatar.com{player.uuid || 'MHF_Steve'}?size=32&default=MHF_Steve" alt="">
+                        <!-- Аватарка тоже грузится по нику через mc-heads -->
+                        <img src="https://mc-heads.net{player.nick}/32" alt="">
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points).replace('◆ ', '')} (${points} pts)</span>
