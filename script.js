@@ -90,8 +90,8 @@ async function savePlayer(event) {
             return;
         }
 
-        const realNick = data.data.player.username;
-        const uuid = data.data.player.id;
+        const realNick = data.username;
+        const uuid = data.uuid;
 
         let player = players.find(p => p.nick.toLowerCase() === realNick.toLowerCase());
         
