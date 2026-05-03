@@ -139,6 +139,7 @@ td {
     height: 32px;
     border-radius: 6px;
     background: #1a1e29;
+    image-rendering: pixelated; /* Делает иконку четкой */
 }
 
 .player-name {
@@ -242,7 +243,7 @@ td {
 .delete-btn { background: #da3633; }
 .delete-btn:hover { background: #f85149; }
 
-/* МОДАЛЬНОЕ ОКНО (СТИЛЬ MCTIERS) */
+/* МОДАЛЬНОЕ ОКНО */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -295,9 +296,12 @@ td {
 }
 
 .modal-skin {
-    height: 180px;
-    width: auto;
-    filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.6));
+    height: 120px;
+    width: 120px;
+    border-radius: 12px;
+    border: 2px solid var(--border-color);
+    background: #1a1e29;
+    image-rendering: pixelated; /* Делает крупную голову четкой */
 }
 
 .modal-nick {
@@ -317,7 +321,7 @@ td {
     font-size: 13px;
     font-weight: 800;
     color: #fff;
-    background: #f85149; /* Цвета бейджа под ником */
+    background: #f85149;
     padding: 4px 10px;
     border-radius: 6px;
     display: inline-block;
@@ -377,7 +381,7 @@ td {
     font-weight: 700;
 }
 
-/* TIERS ГРАФИКИ (ПЛОСКИЕ В РЯД) */
+/* TIERS ГРАФИКИ */
 .modal-tiers-grid {
     background: #1a1e29;
     border: 1px solid var(--border-color);
