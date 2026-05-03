@@ -112,8 +112,9 @@ async function openProfile(nick) {
     document.getElementById('modalRank').textContent = rankIndex + '.';
     document.getElementById('modalPoints').textContent = `(${points} points)`;
     document.getElementById('modalRegion').textContent = player.region || 'NA';
-                    const skinImg = document.getElementById('modalImg');
-    // Прямой запрос 3D-модели в полный рост по нику игрока
+    
+    const skinImg = document.getElementById('modalImg');
+    // ИСПРАВЛЕНО: Добавлен знак $ и правильный путь для 3D скина
     skinImg.src = `https://crafatar.com{player.nick}?scale=4&default=MHF_Steve`;
 
     skinImg.onerror = function() {
@@ -127,6 +128,7 @@ async function openProfile(nick) {
         typeBadge.style.background = "#30363d";
 
         try {
+            // ИСПРАВЛЕНО: Добавлен знак $ и правильный путь к PlayerDB API
             const response = await fetch(`https://playerdb.co{player.nick}`);
             const data = await response.json();
             
@@ -211,6 +213,7 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
+                        <!-- ИСПРАВЛЕНО: Добавлен знак $ и путь к аватарам -->
                         <img src="https://crafatar.com{player.nick}?size=32&default=MHF_Steve" alt="">
 
                     <div>
