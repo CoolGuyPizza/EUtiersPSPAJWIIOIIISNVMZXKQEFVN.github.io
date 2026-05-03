@@ -3,7 +3,6 @@ let currentMode = 'overall';
 
 const modesList = ['vanilla', 'uhc', 'pot', 'netherop', 'smp', 'sword', 'axe', 'mace'];
 
-// НАСТОЯЩИЕ ИКОНКИ, ЗАКОДИРОВАННЫЕ В ТЕКСТ. ТЕПЕРЬ ОНИ БУДУТ РАБОТАТЬ ВСЕГДА!
 const modeIcons = {
     'vanilla': 'icons/vanilla.svg',
     'uhc': 'icons/uhc.svg',
@@ -39,6 +38,7 @@ document.addEventListener('keydown', function(e) {
         panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
     }
 });
+
 function getRankTitle(points) {
     if (points >= 400) return '◆ Combat Grandmaster';
     if (points >= 250) return '◆ Combat Master';
@@ -48,7 +48,6 @@ function getRankTitle(points) {
     if (points >= 10) return '◆ Combat Novice';
     return '◆ Rookie';
 }
-
 
 function calculatePlayerPoints(player) {
     let total = 0;
@@ -64,7 +63,10 @@ function switchMode(mode) {
     renderTable();
 }
 
-async function savePlayer() {
+// ИСПРАВЛЕНО: Добавлен async и отмена стандартного поведения кнопки
+async function savePlayer(event) {
+    if (event) event.preventDefault(); 
+    
     const nick = document.getElementById('nickname').value.trim();
     const mode = document.getElementById('mode-select').value;
     const tier = document.getElementById('tier-select').value;
@@ -72,33 +74,32 @@ async function savePlayer() {
     
     if (!nick) { alert('Введите ник!'); return; }
 
-    // Блокируем кнопку или показываем статус, так как запрос займет секунду
-    const originalBtnText = document.querySelector('#adminPanel button')?.textContent;
-    console.log("Проверяем игрока...");
+    const saveBtn = event ? event.target : document.querySelector('#adminPanel button');
+    const originalText = saveBtn.textContent;
+    saveBtn.textContent = "Проверка...";
+    saveBtn.disabled = true;
 
     try {
-        // Проверяем существование лицензионного аккаунта через PlayerDB
         const response = await fetch(`https://playerdb.co{nick}`);
         const data = await response.json();
         
         if (!data.success) {
-            alert('Ошибка: Такого лицензионного аккаунта не существует! Пиратские ники добавлять нельзя.');
+            alert('Ошибка: Такого лицензионного аккаунта не существует!');
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
             return;
         }
 
-        // Если аккаунт найден, вытаскиваем его НАСТОЯЩИЙ ник и уникальный UUID
         const realNick = data.data.player.username;
         const uuid = data.data.player.id;
 
         let player = players.find(p => p.nick.toLowerCase() === realNick.toLowerCase());
         
         if (!player) {
-            // Добавляем UUID в базу игрока, чтобы потом по нему грузить скин
             player = { nick: realNick, uuid: uuid, region: region, tiers: {} };
             modesList.forEach(m => player.tiers[m] = 'NONE');
             players.push(player);
         } else {
-            // Если игрок уже был, просто обновляем его UUID на всякий случай
             player.uuid = uuid;
         }
         
@@ -113,6 +114,9 @@ async function savePlayer() {
     } catch (error) {
         alert('Ошибка при проверке аккаунта. Попробуйте еще раз.');
         console.error(error);
+    } finally {
+        saveBtn.textContent = originalText;
+        saveBtn.disabled = false;
     }
 }
 
@@ -129,7 +133,7 @@ function deletePlayerFromAdmin() {
     document.getElementById('nickname').value = '';
 }
 
-async function openProfile(nick) {
+function openProfile(nick) {
     const player = players.find(p => p.nick === nick);
     if (!player) return;
 
@@ -145,7 +149,7 @@ async function openProfile(nick) {
     
     const skinImg = document.getElementById('modalImg');
     
-    // ИСПРАВЛЕНО: Теперь скин запрашивается по UUID, а не по нику! Так Crafatar сработает на 100%
+    // ИСПРАВЛЕНО: Прямой запрос скина по UUID
     if (player.uuid) {
         skinImg.src = `https://crafatar.com{player.uuid}?scale=4&default=MHF_Steve`;
     } else {
@@ -157,37 +161,11 @@ async function openProfile(nick) {
         skinImg.src = 'https://crafatar.com';
     };
 
-    // Так как мы теперь пускаем ТОЛЬКО лицензии, плашку можно сделать статичной
     const typeBadge = document.getElementById('modalAccountType');
     if (typeBadge) {
         typeBadge.textContent = "✔ Premium (Лицензия)";
         typeBadge.style.background = "#238636";
     }
-
-    const grid = document.getElementById('modalTiersGrid');
-    grid.innerHTML = '';
-    
-    modesList.forEach(m => {
-        const t = player.tiers[m];
-        if (t !== 'NONE') {
-            const item = document.createElement('div');
-            item.className = 'modal-tier-item';
-            item.innerHTML = `
-                <div class="modal-mode-icon"><img src="${modeIcons[m]}" alt=""></div>
-                <span class="tier-badge ${t}">${t}</span>
-            `;
-            grid.appendChild(item);
-        }
-    });
-    
-    if (grid.innerHTML === '') {
-        grid.innerHTML = '<span style="color: #8b949e; font-size: 14px;">У игрока нет выданных тиров</span>';
-    }
-
-    const overlay = document.getElementById('profileModal');
-    overlay.style.display = 'flex';
-    setTimeout(() => { overlay.classList.add('active'); }, 10);
-}
 
     const grid = document.getElementById('modalTiersGrid');
     grid.innerHTML = '';
@@ -224,6 +202,7 @@ function closeModal(e) { if (e.target.className.includes('modal-overlay')) { clo
 
 function renderTable() {
     const tbody = document.getElementById('leaderboardBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
     
     const searchVal = document.getElementById('searchBar').value.toLowerCase();
@@ -257,9 +236,7 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <!-- ИСПРАВЛЕНО: Добавлен знак $ и путь к аватарам -->
                         <img src="https://crafatar.com{player.uuid || 'MHF_Steve'}?size=32&default=MHF_Steve" alt="">
-
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points).replace('◆ ', '')} (${points} pts)</span>
@@ -272,5 +249,7 @@ function renderTable() {
         tbody.appendChild(tr);
     });
 }
+
+document.getElementById('searchBar').addEventListener('input', renderTable);
 
 renderTable();
