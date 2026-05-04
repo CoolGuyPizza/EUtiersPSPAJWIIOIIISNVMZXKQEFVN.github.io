@@ -139,7 +139,7 @@ td {
     height: 32px;
     border-radius: 6px;
     background: #1a1e29;
-    image-rendering: pixelated; /* Делает иконку четкой */
+    image-rendering: pixelated;
 }
 
 .player-name {
@@ -296,12 +296,12 @@ td {
 }
 
 .modal-skin {
-    height: 120px;
+    height: 180px; /* Сделали выше под скин во весь рост */
     width: 120px;
     border-radius: 12px;
     border: 2px solid var(--border-color);
     background: #1a1e29;
-    image-rendering: pixelated; /* Делает крупную голову четкой */
+    image-rendering: pixelated;
 }
 
 .modal-nick {
