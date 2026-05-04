@@ -136,12 +136,10 @@ function openProfile(nick) {
     document.getElementById('modalPoints').textContent = `(${points} points)`;
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
-        const skinImg = document.getElementById('modalImg');
+    const skinImg = document.getElementById('modalImg');
     
     if (skinImg) {
-        // Безопасное склеивание ссылки для 3D-модели
         skinImg.src = 'https://minotar.net' + player.nick + '/100';
-        
         skinImg.onerror = function() {
             skinImg.onerror = null;
             skinImg.src = 'https://minotar.netSteve/100';
@@ -219,18 +217,12 @@ function renderTable() {
             tierCellHTML = `<span class="tier-badge ${t}">${t}</span>`;
         }
 
-                tr.innerHTML = '<td>' + (index + 1) + '</td>' +
-            '<td>' +
-                '<div class="player-cell" onclick="openProfile(\'' + player.nick + '\')">' +
-                    '<img src="https://minotar.net' + player.nick + '/32" alt="' + player.nick + '" onerror="this.onerror=null;this.src=\'https://minotar.netSteve/32\';">' +
-                    '<div>' +
-                        '<span class="player-name">' + player.nick + '</span>' +
-                        '<span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span>' +
-                    '</div>' +
-                '</div>' +
-            '</td>' +
-            '<td><span class="region-badge">' + (player.region || 'NA') + '</span></td>' +
-            '<td>' + tierCellHTML + '</td>';
+        // Вся строка таблицы теперь записана в одну линию, чтобы исключить ошибки обрыва
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://minotar.net' + player.nick + '/32" alt="' + player.nick + '" onerror="this.onerror=null;this.src=\'https://minotar.netSteve/32\';"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        
+        tbody.appendChild(tr);
+    });
+}
 
 const searchBarEl = document.getElementById('searchBar');
 if (searchBarEl) {
