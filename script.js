@@ -137,9 +137,7 @@ function openProfile(nick) {
     const skinImg = document.getElementById('modalImg');
     
     if (skinImg) {
-        // Подтягиваем полноценный 3D-скин по нику
         skinImg.src = `https://surgeplay.com{player.nick}`;
-
         skinImg.onerror = function() {
             skinImg.onerror = null;
             skinImg.src = 'https://surgeplay.com';
@@ -221,7 +219,6 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <!-- Автоматический запрос 3D-головы по нику -->
                         <img src="https://mc-heads.net{player.nick}/32" alt="${player.nick}" onerror="this.onerror=null;this.src='https://mc-heads.net';">
                     <div>
                         <span class="player-name">${player.nick}</span>
