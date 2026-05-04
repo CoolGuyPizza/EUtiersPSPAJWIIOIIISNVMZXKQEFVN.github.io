@@ -108,11 +108,14 @@ function openProfile(nick) {
     
     const skinImg = document.getElementById('modalImg');
     if (skinImg) {
-        // Проксируем 3D-скин с Crafatar через wsrv.nl
-        skinImg.src = 'https://wsrv.nl' + player.nick + '?scale=4';
+        const lowerNick = player.nick.toLowerCase();
+        // Ищем локальный файл с ником игрока
+        skinImg.src = lowerNick + '.png';
+        
+        // Если файла нет, ставим дефолтного Стива
         skinImg.onerror = function() {
             skinImg.onerror = null;
-            skinImg.src = 'https://wsrv.nlSteve?scale=4';
+            skinImg.src = 'steve.png';
         };
     }
 
@@ -160,8 +163,9 @@ function renderTable() {
         const points = calculatePlayerPoints(player);
         let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
         
-        // Проксируем маленькие аватары с Crafatar через wsrv.nl
-        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://wsrv.nl' + player.nick + '?size=32" alt="' + player.nick + '"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        const lowerNick = player.nick.toLowerCase();
+        
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
     });
