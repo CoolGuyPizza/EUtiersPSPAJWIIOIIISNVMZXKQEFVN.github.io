@@ -1,6 +1,20 @@
-let players = JSON.parse(localStorage.getItem('mcTiersData')) || [];
+// Настройки подключения к твоей базе данных Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
+  authDomain: "://firebaseapp.com",
+  projectId: "eutiers",
+  storageBucket: "eutiers.firebasestorage.app",
+  messagingSenderId: "702553921523",
+  appId: "1:702553921523:web:49f526b38bfbe62f776486",
+  measurementId: "G-6E3XENN5RN"
+};
+
+// Инициализация базы данных
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+let players = [];
 let currentMode = 'overall';
-// Флаг авторизации админа (сохраняется на время сессии вкладки)
 let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
 
 const modesList = ['vanilla', 'uhc', 'pot', 'netherop', 'smp', 'sword', 'axe', 'mace'];
@@ -32,20 +46,30 @@ if (modeSelect) {
     });
 }
 
-// ЛОГИКА АВТОРИЗАЦИИ ПО КЛАВИШЕ ~ / Ё
+// ЗАГРУЗКА ИГРОКОВ ИЗ ОБЛАКА В РЕАЛЬНОМ ВРЕМЕНИ
+function loadPlayersFromCloud() {
+    db.collection("players").onSnapshot((snapshot) => {
+        players = [];
+        snapshot.forEach((doc) => {
+            players.push(doc.data());
+        });
+        renderTable();
+    });
+}
+loadPlayersFromCloud();
+
+// ПРОВЕРКА ФИЗИЧЕСКОЙ КЛАВИШИ (ДЛЯ АДМИНКИ)
 document.addEventListener('keydown', function(e) {
     if (e.code === 'Backquote') {
         const panel = document.getElementById('adminPanel');
         const loginModal = document.getElementById('loginModal');
         
         if (!isAdmin) {
-            // Если не авторизован - показываем окно логина
             if (loginModal) {
                 loginModal.style.display = 'flex';
                 setTimeout(() => { loginModal.classList.add('active'); }, 10);
             }
         } else {
-            // Если уже авторизован - просто переключаем панель
             if (panel) panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
         }
     }
@@ -60,7 +84,6 @@ function tryLogin() {
         sessionStorage.setItem('isAdminAuth', 'true');
         closeLoginDirect();
         
-        // Сразу открываем админ-панель
         const panel = document.getElementById('adminPanel');
         if (panel) panel.style.display = 'block';
         alert('Welcome back, Admin!');
@@ -121,6 +144,7 @@ function switchMode(mode) {
     }
 }
 
+// СОХРАНЕНИЕ В ОБЛАКО
 function savePlayer(event) {
     if (event) event.preventDefault();
     if (!isAdmin) { alert('Access denied!'); return; }
@@ -133,27 +157,37 @@ function savePlayer(event) {
     if (!player) {
         player = { nick: nick, region: document.getElementById('region-select').value, tiers: {} };
         modesList.forEach(m => player.tiers[m] = 'NONE');
-        players.push(player);
     }
     
     player.tiers[document.getElementById('mode-select').value] = document.getElementById('tier-select').value;
     player.region = document.getElementById('region-select').value;
-    localStorage.setItem('mcTiersData', JSON.stringify(players));
-    nickInput.value = '';
-    renderTable();
-    alert(`Player ${nick} successfully added!`);
+
+    db.collection("players").doc(nick.toLowerCase()).set(player)
+    .then(() => {
+        nickInput.value = '';
+        alert(`Player ${nick} successfully saved to cloud!`);
+    })
+    .catch((error) => {
+        alert("Error saving: " + error.message);
+    });
 }
 
+// УДАЛЕНИЕ ИЗ ОБЛАКА
 function deletePlayerFromAdmin() {
     if (!isAdmin) { alert('Access denied!'); return; }
     
     const nickInput = document.getElementById('nickname');
     const nick = nickInput.value.trim();
     if (!nick) { alert('Enter player nickname to delete!'); return; }
-    players = players.filter(p => p.nick.toLowerCase() !== nick.toLowerCase());
-    localStorage.setItem('mcTiersData', JSON.stringify(players));
-    nickInput.value = '';
-    renderTable();
+
+    db.collection("players").doc(nick.toLowerCase()).delete()
+    .then(() => {
+        nickInput.value = '';
+        alert(`Player ${nick} deleted from cloud!`);
+    })
+    .catch((error) => {
+        alert("Error deleting: " + error.message);
+    });
 }
 
 function drawSkinToCanvas(imgSource, container) {
@@ -247,7 +281,7 @@ function openProfile(nick) {
                 grid.innerHTML += `<div class="modal-tier-item"><div class="modal-mode-icon"><img src="${modeIcons[m]}" alt=""></div><span class="tier-badge ${t}">${t}</span></div>`;
             }
         });
-        if (grid.innerHTML === '') grid.innerHTML = '<span style="color: #7b8394; font-size: 13px; font-weight: 700;">No tiers assigned</span>';
+        if (grid.innerHTML === '') grid.innerHTML = '<span style="color: #64748b; font-size: 13px; font-weight: 700;">No tiers assigned</span>';
     }
 
     const overlay = document.getElementById('profileModal');
