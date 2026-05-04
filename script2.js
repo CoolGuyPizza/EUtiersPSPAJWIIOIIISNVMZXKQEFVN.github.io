@@ -219,23 +219,18 @@ function renderTable() {
             tierCellHTML = `<span class="tier-badge ${t}">${t}</span>`;
         }
 
-        tr.innerHTML = `
-            <td class="rank-num">${index + 1}</td>
-            <td>
-                <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <img src="https://minotar.net/avatar/' + player.nick + '/32" alt="' + player.nick + '" onerror="this.onerror=null;this.src='https://minotar.net';">
-                    <div>
-                        <span class="player-name">${player.nick}</span>
-                        <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
-                    </div>
-                </div>
-            </td>
-            <td><span class="region-badge">${player.region || 'NA'}</span></td>
-            <td>${tierCellHTML}</td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
+                tr.innerHTML = '<td>' + (index + 1) + '</td>' +
+            '<td>' +
+                '<div class="player-cell" onclick="openProfile(\'' + player.nick + '\')">' +
+                    '<img src="https://minotar.net' + player.nick + '/32" alt="' + player.nick + '" onerror="this.onerror=null;this.src=\'https://minotar.netSteve/32\';">' +
+                    '<div>' +
+                        '<span class="player-name">' + player.nick + '</span>' +
+                        '<span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span>' +
+                    '</div>' +
+                '</div>' +
+            '</td>' +
+            '<td><span class="region-badge">' + (player.region || 'NA') + '</span></td>' +
+            '<td>' + tierCellHTML + '</td>';
 
 const searchBarEl = document.getElementById('searchBar');
 if (searchBarEl) {
