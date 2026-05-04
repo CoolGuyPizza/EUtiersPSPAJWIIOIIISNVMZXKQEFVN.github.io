@@ -45,9 +45,29 @@
         </table>
     </div>
 
+    <!-- LOGIN MODAL ДЛЯ АДМИНКИ -->
+    <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeLoginDirect()">✕</button>
+            <div class="modal-section-title" style="text-align: center; margin-top: 10px;">ADMIN LOGIN</div>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="adminUser" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="adminPass" placeholder="Enter password">
+            </div>
+            <button class="admin-btn" onclick="tryLogin()">Login</button>
+        </div>
+    </div>
+
     <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
-        <h3>Control Panel</h3>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0;">Control Panel</h3>
+            <button onclick="logoutAdmin()" style="background: none; border: none; color: #da3633; cursor: pointer; font-weight: 800; font-size: 12px; text-transform: uppercase;">Logout</button>
+        </div>
         <div class="form-group">
             <label>Minecraft Username:</label>
             <input type="text" id="nickname" placeholder="Player nick">
