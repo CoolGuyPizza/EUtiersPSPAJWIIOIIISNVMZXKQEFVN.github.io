@@ -6,7 +6,7 @@
     <title>MCTIERS</title>
     <!-- Запрещаем поисковикам индексировать сайт -->
     <meta name="robots" content="noindex, nofollow">
-    <!-- Подключаем жирный шрифт Inter как в MCTiers -->
+    <!-- Подключаем жирный шрифт Inter как в оригинале -->
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -14,7 +14,7 @@
 
     <!-- НАВИГАЦИЯ (РЕЖИМЫ) -->
     <div class="nav-container" id="modesNav">
-        <!-- Кнопки режимов -->
+        <!-- Кнопки режимов генерируются через JS -->
     </div>
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
@@ -35,7 +35,7 @@
                 </tr>
             </thead>
             <tbody id="leaderboardBody">
-                <!-- Строки игроков -->
+                <!-- Строки игроков генерируются через JS -->
             </tbody>
         </table>
     </div>
@@ -85,7 +85,7 @@
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
             
             <div class="avatar-container">
-                <!-- Крупное 2D-лицо игрока в профиле -->
+                <!-- 3D-скин во весь рост -->
                 <img id="modalImg" class="modal-skin" src="" alt="Skin">
             </div>
 
@@ -113,7 +113,6 @@
         </div>
     </div>
 
-    <!-- Принудительно заставляем браузер обновить скрипт с помощью v=5 -->
-    <script src="script.js?v=5"></script>
+    <script src="script.js"></script>
 </body>
 </html>
