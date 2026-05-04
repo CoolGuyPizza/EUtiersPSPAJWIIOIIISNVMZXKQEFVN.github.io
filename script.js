@@ -93,9 +93,6 @@ function deletePlayerFromAdmin() {
     renderTable();
 }
 
-// Глобальная переменная для хранения текущей сцены
-let skinViewer = null;
-
 function openProfile(nick) {
     const player = players.find(p => p.nick === nick);
     if (!player) return;
@@ -109,27 +106,27 @@ function openProfile(nick) {
     document.getElementById('modalPoints').textContent = `(${points} points)`;
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
-    const lowerNick = player.nick.toLowerCase();
-    const canvasEl = document.getElementById("skin_container");
-
-    if (canvasEl) {
-        // Если 3D просмотрщик еще не создавался - создаем
-        if (!skinViewer) {
-            skinViewer = new skinview3d.SkinViewer({
-                canvas: canvasEl,
-                width: 120,
-                height: 180
-            });
-            skinViewer.autoRotate = true;
-            skinViewer.animation = new skinview3d.WalkingAnimation();
-            skinViewer.animation.speed = 1.0;
-        }
-
-        // Загружаем локальный скин игрока
-        skinViewer.loadSkin(lowerNick + ".png").catch(() => {
-            // Если файла нет на гитхабе - молча загружаем Стива
-            skinViewer.loadSkin("steve.png");
-        });
+    const skinContainer = document.getElementById("skin_container");
+    if (skinContainer) {
+        // Очищаем старое содержимое
+        skinContainer.innerHTML = '';
+        
+        // Создаем тег картинки для вывода 3D-человечка
+        const img = document.createElement('img');
+        img.className = 'modal-skin';
+        img.style.width = '120px';
+        img.style.height = '180px';
+        
+        // Берем готовый 3D-кадр из сети по нику
+        img.src = 'https://wsrv.nl' + player.nick + '/100';
+        
+        // Заглушка, если ник пиратский или сервис недоступен
+        img.onerror = function() {
+            img.onerror = null;
+            img.src = 'https://wsrv.nlSteve/100';
+        };
+        
+        skinContainer.appendChild(img);
     }
 
     const grid = document.getElementById('modalTiersGrid');
@@ -178,6 +175,7 @@ function renderTable() {
         
         const lowerNick = player.nick.toLowerCase();
         
+        // В ТАБЛИЦЕ: Иконки берутся из твоих файлов на GitHub
         tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
