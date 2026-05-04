@@ -58,7 +58,7 @@ input[type="text"]:focus {
     outline: none;
 }
 
-/* НАВИГАЦИЯ */
+/* NAVIGATION */
 .nav-container {
     display: flex;
     gap: 12px;
@@ -94,7 +94,7 @@ input[type="text"]:focus {
     border-color: #388bfd;
 }
 
-/* ТАБЛИЦА */
+/* TABLE */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -134,7 +134,7 @@ td {
     color: #388bfd;
 }
 
-/* Головы в таблице (вырезаются из скина) */
+/* Table heads (cut from skin) */
 .css-head {
     width: 32px;
     height: 32px;
@@ -175,7 +175,7 @@ td {
     flex-wrap: wrap;
 }
 
-/* ТИРЫ */
+/* TIERS */
 .tier-badge {
     padding: 4px 6px;
     border-radius: 4px;
@@ -192,7 +192,7 @@ td {
 .HT5 { background: #8957e5; } .LT5 { background: #a371f7; }
 .NONE { background: #30363d; color: var(--text-gray); }
 
-/* АДМИН ПАНЕЛЬ */
+/* ADMIN PANEL */
 .admin-panel {
     position: fixed;
     top: 20px;
@@ -247,7 +247,7 @@ td {
 .delete-btn { background: #da3633; }
 .delete-btn:hover { background: #f85149; }
 
-/* МОДАЛЬНОЕ ОКНО */
+/* MODAL WINDOW */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -349,7 +349,7 @@ td {
     margin: 24px 0 10px 0;
 }
 
-/* POSITION БЛОК */
+/* POSITION BLOCK */
 .modal-box {
     background: #1a1e29;
     border: 1px solid var(--border-color);
@@ -385,7 +385,7 @@ td {
     font-weight: 700;
 }
 
-/* TIERS ГРАФИКИ */
+/* TIERS GRAPHS */
 .modal-tiers-grid {
     background: #1a1e29;
     border: 1px solid var(--border-color);
@@ -412,7 +412,7 @@ td {
     display: block;
 }
 
-/* СТИЛИ ДЛЯ ПЛАВНОГО ПЕРЕХОДА ТАБЛИЦЫ */
+/* STYLES FOR SMOOTH TABLE TRANSITIONS */
 .fade-in {
     opacity: 1;
     transition: opacity 0.2s ease-in-out;
