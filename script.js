@@ -1,5 +1,7 @@
 let players = JSON.parse(localStorage.getItem('mcTiersData')) || [];
 let currentMode = 'overall';
+// Флаг авторизации админа (сохраняется на время сессии вкладки)
+let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
 
 const modesList = ['vanilla', 'uhc', 'pot', 'netherop', 'smp', 'sword', 'axe', 'mace'];
 
@@ -30,13 +32,57 @@ if (modeSelect) {
     });
 }
 
-// ПРОВЕРКА ФИЗИЧЕСКОЙ КЛАВИШИ (ВНЕ ЗАВИСИМОСТИ ОТ ЯЗЫКА)
+// ЛОГИКА АВТОРИЗАЦИИ
 document.addEventListener('keydown', function(e) {
     if (e.code === 'Backquote') {
         const panel = document.getElementById('adminPanel');
-        if (panel) panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+        const loginModal = document.getElementById('loginModal');
+        
+        if (!isAdmin) {
+            // Если не авторизован - показываем окно логина
+            if (loginModal) {
+                loginModal.style.display = 'flex';
+                setTimeout(() => { loginModal.classList.add('active'); }, 10);
+            }
+        } else {
+            // Если уже авторизован - просто переключаем панель
+            if (panel) panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+        }
     }
 });
+
+function tryLogin() {
+    const user = document.getElementById('adminUser').value;
+    const pass = document.getElementById('adminPass').value;
+    
+    if (user === 'legendgaymer92' && pass === 'skibididemon999') {
+        isAdmin = true;
+        sessionStorage.setItem('isAdminAuth', 'true');
+        closeLoginDirect();
+        
+        // Сразу открываем админ-панель
+        const panel = document.getElementById('adminPanel');
+        if (panel) panel.style.display = 'block';
+        alert('Welcome back, Admin!');
+    } else {
+        alert('Incorrect username or password!');
+    }
+}
+
+function logoutAdmin() {
+    isAdmin = false;
+    sessionStorage.removeItem('isAdminAuth');
+    const panel = document.getElementById('adminPanel');
+    if (panel) panel.style.display = 'none';
+    alert('Logged out successfully.');
+}
+
+function closeLoginDirect() {
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) { loginModal.classList.remove('active'); setTimeout(() => { loginModal.style.display = 'none'; }, 200); }
+}
+
+function closeLoginModal(e) { if (e.target.id === 'loginModal') closeLoginDirect(); }
 
 function getRankTitle(points) {
     if (points >= 400) return 'Combat Grandmaster';
@@ -77,6 +123,8 @@ function switchMode(mode) {
 
 function savePlayer(event) {
     if (event) event.preventDefault();
+    if (!isAdmin) { alert('Access denied!'); return; }
+    
     const nickInput = document.getElementById('nickname');
     const nick = nickInput.value.trim();
     if (!nick) { alert('Please enter a nickname!'); return; }
@@ -97,6 +145,8 @@ function savePlayer(event) {
 }
 
 function deletePlayerFromAdmin() {
+    if (!isAdmin) { alert('Access denied!'); return; }
+    
     const nickInput = document.getElementById('nickname');
     const nick = nickInput.value.trim();
     if (!nick) { alert('Enter player nickname to delete!'); return; }
@@ -191,55 +241,4 @@ function openProfile(nick) {
     const grid = document.getElementById('modalTiersGrid');
     if (grid) {
         grid.innerHTML = '';
-        modesList.forEach(m => {
-            const t = player.tiers[m];
-            if (t !== 'NONE') {
-                grid.innerHTML += `<div class="modal-tier-item"><div class="modal-mode-icon"><img src="${modeIcons[m]}" alt=""></div><span class="tier-badge ${t}">${t}</span></div>`;
-            }
-        });
-        if (grid.innerHTML === '') grid.innerHTML = '<span style="color: #7b8394; font-size: 13px; font-weight: 700;">No tiers assigned</span>';
-    }
-
-    const overlay = document.getElementById('profileModal');
-    if (overlay) { overlay.style.display = 'flex'; setTimeout(() => { overlay.classList.add('active'); }, 10); }
-}
-
-function closeModalDirect() {
-    const overlay = document.getElementById('profileModal');
-    if (overlay) { overlay.classList.remove('active'); setTimeout(() => { overlay.style.display = 'none'; }, 200); }
-}
-
-function closeModal(e) { if (e.target.className.includes('modal-overlay')) closeModalDirect(); }
-
-function renderTable() {
-    const tbody = document.getElementById('leaderboardBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-    
-    const searchBar = document.getElementById('searchBar');
-    const searchVal = searchBar ? searchBar.value.toLowerCase() : '';
-    let displayPlayers = players.filter(p => p.nick.toLowerCase().includes(searchVal));
-
-    if (currentMode === 'overall') { 
-        displayPlayers.sort((a, b) => calculatePlayerPoints(b) - calculatePlayerPoints(a)); 
-    } else { 
-        displayPlayers = displayPlayers.filter(p => p.tiers[currentMode] !== 'NONE'); 
-        displayPlayers.sort((a, b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]); 
-    }
-
-    displayPlayers.forEach((player, index) => {
-        const tr = document.createElement('tr');
-        const points = calculatePlayerPoints(player);
-        let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
-                
-        const lowerNick = player.nick.toLowerCase();
-
-        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
-        
-        tbody.appendChild(tr);
-    });
-}
-
-const sBar = document.getElementById('searchBar');
-if (sBar) sBar.addEventListener('input', renderTable);
-renderTable();
+        modesList.forEach(m
