@@ -1,55 +1,54 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MCTIERS</title>
-    <!-- Запрещаем поисковикам индексировать сайт -->
+    <title>EUTIERS</title>
+    <!-- Prevent search engines from indexing the site -->
     <meta name="robots" content="noindex, nofollow">
-    <!-- Подключаем жирный шрифт Inter как в оригинале -->
+    <!-- Connect Inter bold font as in the original -->
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- НАВИГАЦИЯ (РЕЖИМЫ) -->
+    <!-- NAVIGATION (MODES) -->
     <div class="nav-container" id="modesNav">
-        <!-- Кнопки режимов генерируются через JS -->
+        <!-- Mode buttons are generated via JS -->
     </div>
 
-    <!-- ОСНОВНОЙ КОНТЕНТ -->
+    <!-- MAIN CONTENT -->
     <div class="container">
         <div class="header-row">
             <h1 id="tier-header-title">ALL TIERS</h1>
-            <input type="text" id="searchBar" placeholder="Поиск игрока...">
+            <input type="text" id="searchBar" placeholder="Search player...">
         </div>
 
-        <!-- ТАБЛИЦА ЛИДЕРОВ -->
+        <!-- LEADERBOARD -->
         <table>
             <thead>
                 <tr>
                     <th style="width: 50px;">#</th>
-                    <th>ИГРОК</th>
-                    <th style="width: 100px;">РЕГИОН</th>
+                    <th>PLAYER</th>
+                    <th style="width: 100px;">REGION</th>
                     <th style="width: 150px;">TIERS</th>
                 </tr>
             </thead>
-            <!-- Добавлен класс fade-in для плавности -->
             <tbody id="leaderboardBody" class="fade-in">
-                <!-- Строки игроков генерируются через JS -->
+                <!-- Player rows are generated via JS -->
             </tbody>
         </table>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ -->
+    <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
-        <h3>Панель управления</h3>
+        <h3>Control Panel</h3>
         <div class="form-group">
-            <label>Ник в Minecraft:</label>
+            <label>Minecraft Username:</label>
             <input type="text" id="nickname" placeholder="Player nick">
         </div>
         <div class="form-group">
-            <label>Регион:</label>
+            <label>Region:</label>
             <select id="region-select">
                 <option value="EU">EU</option>
                 <option value="NA">NA</option>
@@ -57,11 +56,11 @@
             </select>
         </div>
         <div class="form-group">
-            <label>Режим:</label>
+            <label>Mode:</label>
             <select id="mode-select"></select>
         </div>
         <div class="form-group">
-            <label>Тир:</label>
+            <label>Tier:</label>
             <select id="tier-select">
                 <option value="HT1">HT1</option>
                 <option value="LT1">LT1</option>
@@ -76,8 +75,8 @@
                 <option value="NONE">NONE</option>
             </select>
         </div>
-        <button class="admin-btn" onclick="savePlayer(event)">Сохранить / Обновить</button>
-        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Удалить игрока</button>
+        <button class="admin-btn" onclick="savePlayer(event)">Save / Update</button>
+        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete Player</button>
     </div>
 
     <!-- PROFILE MODAL -->
