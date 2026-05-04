@@ -112,37 +112,13 @@ function openProfile(nick) {
         
         const img = document.createElement('img');
         img.className = 'modal-skin';
-        img.style.width = '120px';
-        img.style.height = '180px';
-        img.style.objectFit = 'contain';
-
-        const lowerNick = player.nick.toLowerCase();
-        const localSkinPath = `${lowerNick}.png`;
-
-        // Логика проверки файла на твоем сервере
-        fetch(localSkinPath, { method: 'HEAD' })
-        .then(res => {
-            if (res.ok) {
-                // Если файл найден, отправляем его в API для 3D рендера
-                const siteUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-                const fullSkinUrl = siteUrl + localSkinPath;
-                img.src = `https://mineskin.eu{player.nick}?skin=${encodeURIComponent(fullSkinUrl)}`;
-            } else {
-                loadSteveSkin(img);
-            }
-        })
-        .catch(() => {
-            loadSteveSkin(img);
-        });
-
-        function loadSteveSkin(imageTag) {
-            // Как альтернатива - можно поставить сюда просто ссылку на steve.png
-            imageTag.src = 'https://surgeplay.com';
-        }
-
+        
+        // Как на скрине mctiers: 3D рендер головы и плеч с небольшим поворотом
+        img.src = `https://surgeplay.com{player.nick}`;
+        
         img.onerror = function() {
             img.onerror = null;
-            loadSteveSkin(img);
+            img.src = 'https://surgeplay.com';
         };
 
         skinContainer.appendChild(img);
@@ -191,10 +167,9 @@ function renderTable() {
         const tr = document.createElement('tr');
         const points = calculatePlayerPoints(player);
         let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
-        
-        const lowerNick = player.nick.toLowerCase();
-        
-        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+                
+        // В ТАБЛИЦЕ: Головы берутся из интернета по нику. Если ника нет, сервис сам выдаст Стива
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'https://crafatar.com' + player.nick + '?size=32&overlay=true\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
     });
