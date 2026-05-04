@@ -17,6 +17,26 @@ body {
     letter-spacing: -0.02em;
 }
 
+/* СТИЛИ ДЛЯ ШАПКИ И ЛОГОТИПА */
+.top-header {
+    max-width: 1200px;
+    margin: 0 auto 20px auto;
+    background: var(--card-bg);
+    padding: 16px 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #fff;
+    letter-spacing: 0.5px;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
