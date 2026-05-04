@@ -30,8 +30,9 @@ if (modeSelect) {
     });
 }
 
+// ВОЗВРАЩЕНА КЛАВИША "Ё" ДЛЯ ОТКРЫТИЯ ПАНЕЛИ
 document.addEventListener('keydown', function(e) {
-    if (e.key === '`' || e.key === '~') {
+    if (e.key === '`' || e.key === '~' || e.key === 'ё' || e.key === 'Ё') {
         const panel = document.getElementById('adminPanel');
         if (panel) panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
     }
