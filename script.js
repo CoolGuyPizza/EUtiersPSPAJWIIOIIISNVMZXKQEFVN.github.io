@@ -108,12 +108,24 @@ function openProfile(nick) {
     
     const skinImg = document.getElementById('modalImg');
     if (skinImg) {
-        // Прямой запрос без сложных прокси
-        skinImg.src = 'https://crafthead.net' + player.nick;
-        skinImg.onerror = function() {
-            skinImg.onerror = null;
-            skinImg.src = 'https://crafthead.netSteve';
-        };
+        // Берем официальный аватар из сессий Mojang
+        skinImg.src = 'https://minecraft.net'; 
+        
+        // Запрашиваем UUID игрока, чтобы вытащить его официальную текстуру
+        fetch('https://mojang.com' + player.nick)
+            .then(res => res.json())
+            .then(data => {
+                return fetch('https://mojang.com' + data.id);
+            })
+            .then(res => res.json())
+            .then(profile => {
+                const textureData = JSON.parse(atob(profile.properties[0].value));
+                skinImg.src = textureData.textures.SKIN.url;
+            })
+            .catch(() => {
+                // Если ник пиратский или не нашелся — ставим дефолтного Стива
+                skinImg.src = 'https://minecraft.net';
+            });
     }
 
     const grid = document.getElementById('modalTiersGrid');
@@ -160,10 +172,22 @@ function renderTable() {
         const points = calculatePlayerPoints(player);
         let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
         
-        // Прямой запрос без сложных прокси
-        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://crafthead.net' + player.nick + '" alt="' + player.nick + '"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        // Используем в таблице прямую ссылку на аватар
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://minecraft.net" id="tbl-img-' + index + '"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
+
+        // Динамически подгружаем настоящие аватарки через Mojang API
+        fetch('https://mojang.com' + player.nick)
+            .then(res => res.json())
+            .then(data => fetch('https://mojang.com' + data.id))
+            .then(res => res.json())
+            .then(profile => {
+                const textureData = JSON.parse(atob(profile.properties[0].value));
+                const imgEl = document.getElementById('tbl-img-' + index);
+                if (imgEl) imgEl.src = textureData.textures.SKIN.url;
+            })
+            .catch(() => {});
     });
 }
 
