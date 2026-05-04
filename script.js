@@ -31,7 +31,7 @@ if (modeSelect) {
 }
 
 document.addEventListener('keydown', function(e) {
-    if (e.key === '`' || e.key === '~' || e.key === 'ё' || e.key === 'Ё') {
+    if (e.key === '`' || e.key === '~') {
         const panel = document.getElementById('adminPanel');
         if (panel) panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
     }
@@ -78,7 +78,7 @@ function savePlayer(event) {
     if (event) event.preventDefault();
     const nickInput = document.getElementById('nickname');
     const nick = nickInput.value.trim();
-    if (!nick) { alert('Введите ник!'); return; }
+    if (!nick) { alert('Please enter a nickname!'); return; }
 
     let player = players.find(p => p.nick.toLowerCase() === nick.toLowerCase());
     if (!player) {
@@ -92,20 +92,19 @@ function savePlayer(event) {
     localStorage.setItem('mcTiersData', JSON.stringify(players));
     nickInput.value = '';
     renderTable();
-    alert(`Игрок ${nick} успешно добавлен!`);
+    alert(`Player ${nick} successfully added!`);
 }
 
 function deletePlayerFromAdmin() {
     const nickInput = document.getElementById('nickname');
     const nick = nickInput.value.trim();
-    if (!nick) { alert('Введите ник игрока для удаления!'); return; }
+    if (!nick) { alert('Enter player nickname to delete!'); return; }
     players = players.filter(p => p.nick.toLowerCase() !== nick.toLowerCase());
     localStorage.setItem('mcTiersData', JSON.stringify(players));
     nickInput.value = '';
     renderTable();
 }
 
-// ЭТА ФУНКЦИЯ СОБИРАЕТ СКИН ИЗ ЧАСТЕЙ
 function drawSkinToCanvas(imgSource, container) {
     const canvas = document.createElement('canvas');
     canvas.width = 16;
@@ -122,22 +121,15 @@ function drawSkinToCanvas(imgSource, container) {
     img.onload = function() {
         ctx.imageSmoothingEnabled = false;
         
-        // Голова
         ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8);
-        // Шлем (оверлей головы)
         ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8);
         
-        // Тело
         ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12);
-        // Оверлей тела
         ctx.drawImage(img, 20, 36, 8, 12, 4, 8, 8, 12);
         
-        // Левая рука
         ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12);
-        // Оверлей левой руки
         ctx.drawImage(img, 52, 52, 4, 12, 0, 8, 4, 12);
         
-        // Правая рука (зеркалим левую для старых скинов 64х32)
         if (img.height === 32) {
             ctx.save();
             ctx.translate(16, 0);
@@ -149,12 +141,9 @@ function drawSkinToCanvas(imgSource, container) {
             ctx.drawImage(img, 52, 68, 4, 12, 12, 8, 4, 12);
         }
         
-        // Левая нога
         ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12);
-        // Оверлей левой ноги
         ctx.drawImage(img, 4, 36, 4, 12, 4, 20, 4, 12);
         
-        // Правая нога (зеркалим левую для старых скинов 64х32)
         if (img.height === 32) {
             ctx.save();
             ctx.translate(16, 0);
@@ -195,7 +184,6 @@ function openProfile(nick) {
         skinContainer.innerHTML = '';
         const lowerNick = player.nick.toLowerCase();
         
-        // Вызываем сборщик скина
         drawSkinToCanvas(`${lowerNick}.png`, skinContainer);
     }
 
@@ -208,7 +196,7 @@ function openProfile(nick) {
                 grid.innerHTML += `<div class="modal-tier-item"><div class="modal-mode-icon"><img src="${modeIcons[m]}" alt=""></div><span class="tier-badge ${t}">${t}</span></div>`;
             }
         });
-        if (grid.innerHTML === '') grid.innerHTML = '<span style="color: #7b8394; font-size: 13px; font-weight: 700;">У игрока нет выданных тиров</span>';
+        if (grid.innerHTML === '') grid.innerHTML = '<span style="color: #7b8394; font-size: 13px; font-weight: 700;">No tiers assigned</span>';
     }
 
     const overlay = document.getElementById('profileModal');
