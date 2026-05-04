@@ -1,460 +1,294 @@
-:root {
-    /* Цвета изменены на глубоководные морские оттенки */
-    --bg-color: #030712;
-    --card-bg: #0b1528;
-    --text-color: #ffffff;
-    --text-gray: #64748b;
-    --accent: #00b4d8;
-    --border-color: #1e293b;
-    --box-inner-bg: #0f172a;
+let players = JSON.parse(localStorage.getItem('mcTiersData')) || [];
+let currentMode = 'overall';
+// Флаг авторизации админа (сохраняется на время сессии вкладки)
+let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
+
+const modesList = ['vanilla', 'uhc', 'pot', 'netherop', 'smp', 'sword', 'axe', 'mace'];
+
+const modeIcons = {
+    'vanilla': 'icons/vanilla.svg', 'uhc': 'icons/uhc.svg', 'pot': 'icons/pot.svg',
+    'netherop': 'icons/nethop.svg', 'smp': 'icons/smp.svg', 'sword': 'icons/sword.svg',
+    'axe': 'icons/axe.svg', 'mace': 'icons/mace.svg'
+};
+
+const pointsMapping = { 'HT1': 60, 'LT1': 45, 'HT2': 30, 'LT2': 20, 'HT3': 10, 'LT3': 6, 'HT4': 4, 'LT4': 3, 'HT5': 5, 'LT5': 1, 'NONE': 0 };
+const tierOrder = { 'HT1': 1, 'LT1': 2, 'HT2': 3, 'LT2': 4, 'HT3': 5, 'LT3': 6, 'HT4': 7, 'LT4': 8, 'HT5': 9, 'LT5': 10, 'NONE': 11 };
+
+const navCont = document.getElementById('modesNav');
+if (navCont) {
+    navCont.innerHTML = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
+    modesList.forEach(m => {
+        const label = m === 'netherop' ? 'NethOP' : m.charAt(0).toUpperCase() + m.slice(1);
+        navCont.innerHTML += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}" alt="">${label}</button>`;
+    });
 }
 
-body {
-    /* Фоновый градиент имитирует погружение на глубину */
-    background: linear-gradient(to bottom, #0f172a 0%, #030712 100%);
-    color: var(--text-color);
-    font-family: 'Inter', -apple-system, sans-serif;
-    margin: 0;
-    padding: 20px;
-    letter-spacing: -0.02em;
-    min-height: 100vh;
+const modeSelect = document.getElementById('mode-select');
+if (modeSelect) {
+    modesList.forEach(m => {
+        const option = document.createElement('option');
+        option.value = m; option.textContent = m.toUpperCase();
+        modeSelect.appendChild(option);
+    });
 }
 
-/* СТИЛИ ДЛЯ ШАПКИ И БОЛЬШОГО ГРАДИЕНТНОГО ЛОГОТИПА */
-.top-header {
-    max-width: 1200px;
-    margin: 0 auto 20px auto;
-    background: var(--card-bg);
-    padding: 20px 24px;
-    border-radius: 12px;
-    border: 1px solid rgba(56, 189, 248, 0.2); /* Бирюзовая граница */
-    display: flex;
-    align-items: center;
-    box-shadow: 0 4px 20px rgba(0, 180, 216, 0.1); /* Мягкое свечение */
+// ПРОВЕРКА ФИЗИЧЕСКОЙ КЛАВИШИ (ДЛЯ АДМИНКИ)
+document.addEventListener('keydown', function(e) {
+    if (e.code === 'Backquote') {
+        const panel = document.getElementById('adminPanel');
+        const loginModal = document.getElementById('loginModal');
+        
+        if (!isAdmin) {
+            if (loginModal) {
+                loginModal.style.display = 'flex';
+                setTimeout(() => { loginModal.classList.add('active'); }, 10);
+            }
+        } else {
+            if (panel) panel.style.display = (panel.style.display === 'none' || panel.style.display === '') ? 'block' : 'none';
+        }
+    }
+});
+
+function tryLogin() {
+    const user = document.getElementById('adminUser').value;
+    const pass = document.getElementById('adminPass').value;
+    
+    if (user === 'legendgaymer92' && pass === 'skibididemon999') {
+        isAdmin = true;
+        sessionStorage.setItem('isAdminAuth', 'true');
+        closeLoginDirect();
+        
+        const panel = document.getElementById('adminPanel');
+        if (panel) panel.style.display = 'block';
+        alert('Welcome back, Admin!');
+    } else {
+        alert('Incorrect username or password!');
+    }
 }
 
-.logo {
-    font-size: 34px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    background: linear-gradient(to bottom, #00b4d8 0%, #38bdf8 40%, #ffffff 100%);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: transparent;
-    display: inline-block;
+function logoutAdmin() {
+    isAdmin = false;
+    sessionStorage.removeItem('isAdminAuth');
+    const panel = document.getElementById('adminPanel');
+    if (panel) panel.style.display = 'none';
+    alert('Logged out successfully.');
 }
 
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: var(--card-bg);
-    padding: 24px;
-    border-radius: 12px;
-    border: 1px solid rgba(56, 189, 248, 0.1);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+function closeLoginDirect() {
+    const loginModal = document.getElementById('loginModal');
+    if (loginModal) { loginModal.classList.remove('active'); setTimeout(() => { loginModal.style.display = 'none'; }, 200); }
 }
 
-.header-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 24px;
+function closeLoginModal(e) { if (e.target.id === 'loginModal') closeLoginDirect(); }
+
+function getRankTitle(points) {
+    if (points >= 400) return 'Combat Grandmaster';
+    if (points >= 250) return 'Combat Master';
+    if (points >= 100) return 'Combat Ace';
+    if (points >= 50) return 'Combat Specialist';
+    if (points >= 20) return 'Combat Cadet';
+    if (points >= 10) return 'Combat Novice';
+    return 'Rookie';
 }
 
-h1 {
-    font-size: 26px;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0;
+function calculatePlayerPoints(player) {
+    let total = 0;
+    modesList.forEach(m => { total += pointsMapping[player.tiers[m]] || 0; });
+    return total;
 }
 
-input[type="text"], input[type="password"] {
-    background: var(--box-inner-bg);
-    border: 1px solid var(--border-color);
-    color: #fff;
-    padding: 12px 16px;
-    border-radius: 8px;
-    width: 250px;
-    font-size: 14px;
-    font-weight: 500;
-    transition: 0.2s;
+function switchMode(mode) {
+    const tbody = document.getElementById('leaderboardBody');
+    currentMode = mode;
+    
+    if (navCont) navCont.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    
+    const headerTitle = document.getElementById('tier-header-title');
+    if (headerTitle) headerTitle.textContent = (mode === 'overall') ? 'ALL TIERS' : 'TIER';
+
+    if (tbody) {
+        tbody.classList.add('fade-out');
+        setTimeout(() => {
+            renderTable();
+            tbody.classList.remove('fade-out');
+        }, 200);
+    } else {
+        renderTable();
+    }
 }
 
-input[type="text"]:focus, input[type="password"]:focus {
-    border-color: #00b4d8;
-    outline: none;
-    box-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
+function savePlayer(event) {
+    if (event) event.preventDefault();
+    if (!isAdmin) { alert('Access denied!'); return; }
+    
+    const nickInput = document.getElementById('nickname');
+    const nick = nickInput.value.trim();
+    if (!nick) { alert('Please enter a nickname!'); return; }
+
+    let player = players.find(p => p.nick.toLowerCase() === nick.toLowerCase());
+    if (!player) {
+        player = { nick: nick, region: document.getElementById('region-select').value, tiers: {} };
+        modesList.forEach(m => player.tiers[m] = 'NONE');
+        players.push(player);
+    }
+    
+    player.tiers[document.getElementById('mode-select').value] = document.getElementById('tier-select').value;
+    player.region = document.getElementById('region-select').value;
+    
+    localStorage.setItem('mcTiersData', JSON.stringify(players));
+    nickInput.value = '';
+    renderTable();
+    alert(`Player ${nick} successfully added!`);
 }
 
-/* NAVIGATION */
-.nav-container {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-bottom: 24px;
+function deletePlayerFromAdmin() {
+    if (!isAdmin) { alert('Access denied!'); return; }
+    
+    const nickInput = document.getElementById('nickname');
+    const nick = nickInput.value.trim();
+    if (!nick) { alert('Enter player nickname to delete!'); return; }
+    players = players.filter(p => p.nick.toLowerCase() !== nick.toLowerCase());
+    localStorage.setItem('mcTiersData', JSON.stringify(players));
+    nickInput.value = '';
+    renderTable();
+    alert(`Player ${nick} deleted!`);
 }
 
-.mode-btn {
-    background: #0b1528;
-    border: 1px solid rgba(56, 189, 248, 0.1);
-    color: var(--text-gray);
-    padding: 12px 18px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 800;
-    text-transform: uppercase;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    transition: 0.2s;
+function drawSkinToCanvas(imgSource, container) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16;
+    canvas.height = 32;
+    canvas.style.width = '100px';
+    canvas.style.height = '180px';
+    canvas.style.imageRendering = 'pixelated';
+    canvas.className = 'modal-skin';
+    
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imgSource;
+    
+    img.onload = function() {
+        ctx.imageSmoothingEnabled = false;
+        
+        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8);
+        ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8);
+        
+        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12);
+        ctx.drawImage(img, 20, 36, 8, 12, 4, 8, 8, 12);
+        
+        ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12);
+        ctx.drawImage(img, 52, 52, 4, 12, 0, 8, 4, 12);
+        
+        if (img.height === 32) {
+            ctx.save();
+            ctx.translate(16, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12);
+            ctx.restore();
+        } else {
+            ctx.drawImage(img, 36, 52, 4, 12, 12, 8, 4, 12);
+            ctx.drawImage(img, 52, 68, 4, 12, 12, 8, 4, 12);
+        }
+        
+        ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12);
+        ctx.drawImage(img, 4, 36, 4, 12, 4, 20, 4, 12);
+        
+        if (img.height === 32) {
+            ctx.save();
+            ctx.translate(16, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12);
+            ctx.restore();
+        } else {
+            ctx.drawImage(img, 20, 52, 4, 12, 8, 20, 4, 12);
+            ctx.drawImage(img, 4, 68, 4, 12, 8, 20, 4, 12);
+        }
+        
+        container.appendChild(canvas);
+    };
+    
+    img.onerror = function() {
+        if (imgSource !== 'steve.png') {
+            container.innerHTML = '';
+            drawSkinToCanvas('steve.png', container);
+        }
+    };
 }
 
-.mode-btn img {
-    width: 22px;
-    height: 22px;
+function openProfile(nick) {
+    const player = players.find(p => p.nick === nick);
+    if (!player) return;
+
+    const sorted = [...players].sort((a, b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
+    const points = calculatePlayerPoints(player);
+
+    document.getElementById('modalNick').textContent = player.nick;
+    document.getElementById('modalRole').textContent = getRankTitle(points);
+    document.getElementById('modalRank').textContent = (sorted.findIndex(p => p.nick === nick) + 1) + '.';
+    document.getElementById('modalPoints').textContent = `(${points} points)`;
+    document.getElementById('modalRegion').textContent = player.region || 'NA';
+
+    const skinContainer = document.getElementById("skin_container");
+    if (skinContainer) {
+        skinContainer.innerHTML = '';
+        const lowerNick = player.nick.toLowerCase();
+        
+        drawSkinToCanvas(`${lowerNick}.png`, skinContainer);
+    }
+
+    const grid = document.getElementById('modalTiersGrid');
+    if (grid) {
+        grid.innerHTML = '';
+        modesList.forEach(m => {
+            const t = player.tiers[m];
+            if (t !== 'NONE') {
+                grid.innerHTML += `<div class="modal-tier-item"><div class="modal-mode-icon"><img src="${modeIcons[m]}" alt=""></div><span class="tier-badge ${t}">${t}</span></div>`;
+            }
+        });
+        if (grid.innerHTML === '') grid.innerHTML = '<span style="color: #64748b; font-size: 13px; font-weight: 700;">No tiers assigned</span>';
+    }
+
+    const overlay = document.getElementById('profileModal');
+    if (overlay) { overlay.style.display = 'flex'; setTimeout(() => { overlay.classList.add('active'); }, 10); }
 }
 
-.mode-btn:hover, .mode-btn.active {
-    background: #112240;
-    color: #fff;
-    border-color: #00b4d8;
-    box-shadow: 0 0 15px rgba(0, 180, 216, 0.2);
+function closeModalDirect() {
+    const overlay = document.getElementById('profileModal');
+    if (overlay) { overlay.classList.remove('active'); setTimeout(() => { overlay.style.display = 'none'; }, 200); }
 }
 
-/* TABLE */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+function closeModal(e) { if (e.target.className.includes('modal-overlay')) closeModalDirect(); }
+
+function renderTable() {
+    const tbody = document.getElementById('leaderboardBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    const searchBar = document.getElementById('searchBar');
+    const searchVal = searchBar ? searchBar.value.toLowerCase() : '';
+    let displayPlayers = players.filter(p => p.nick.toLowerCase().includes(searchVal));
+
+    if (currentMode === 'overall') { 
+        displayPlayers.sort((a, b) => calculatePlayerPoints(b) - calculatePlayerPoints(a)); 
+    } else { 
+        displayPlayers = displayPlayers.filter(p => p.tiers[currentMode] !== 'NONE'); 
+        displayPlayers.sort((a, b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]); 
+    }
+
+    displayPlayers.forEach((player, index) => {
+        const tr = document.createElement('tr');
+        const points = calculatePlayerPoints(player);
+        let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
+                
+        const lowerNick = player.nick.toLowerCase();
+
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        
+        tbody.appendChild(tr);
+    });
 }
 
-th {
-    color: var(--text-gray);
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 12px;
-    border-bottom: 2px solid var(--border-color);
-}
-
-td {
-    padding: 16px 12px;
-    border-bottom: 1px solid rgba(56, 189, 248, 0.05);
-    font-size: 14px;
-    vertical-align: middle;
-}
-
-.rank-num {
-    font-weight: 900;
-    color: var(--text-gray);
-    font-size: 16px;
-}
-
-.player-cell {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    cursor: pointer;
-}
-
-.player-cell:hover .player-name {
-    color: #00b4d8;
-}
-
-/* Table heads (cut from skin) */
-.css-head {
-    width: 32px;
-    height: 32px;
-    border-radius: 6px;
-    background-repeat: no-repeat;
-    background-size: 256px 128px;
-    background-position: -32px -32px;
-    image-rendering: pixelated;
-    background-color: var(--box-inner-bg);
-}
-
-.player-name {
-    font-weight: 800;
-    display: block;
-    font-size: 15px;
-}
-
-.player-title {
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-gray);
-    display: block;
-    margin-top: 2px;
-}
-
-.region-badge {
-    background: #0f172a;
-    padding: 5px 8px;
-    border-radius: 6px;
-    font-weight: 800;
-    font-size: 11px;
-    color: #00b4d8;
-    border: 1px solid rgba(0, 180, 216, 0.2);
-}
-
-.tiers-row {
-    display: flex;
-    gap: 6px;
-    flex-wrap: wrap;
-}
-
-/* TIERS */
-.tier-badge {
-    padding: 4px 6px;
-    border-radius: 4px;
-    font-weight: 900;
-    font-size: 11px;
-    color: #fff;
-    text-transform: uppercase;
-}
-
-.HT1 { background: #da3633; } .LT1 { background: #f85149; }
-.HT2 { background: #d29922; } .LT2 { background: #e3b341; }
-.HT3 { background: #238636; } .LT3 { background: #2ea043; }
-.HT4 { background: #1f6feb; } .LT4 { background: #388bfd; }
-.HT5 { background: #8957e5; } .LT5 { background: #a371f7; }
-.NONE { background: #334155; color: var(--text-gray); }
-
-/* ADMIN PANEL */
-.admin-panel {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: #0b1528;
-    border: 1px solid #1e293b;
-    padding: 20px;
-    border-radius: 12px;
-    width: 300px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 1000;
-    backdrop-filter: blur(10px);
-}
-
-.admin-panel h3 { margin-top: 0; font-size: 16px; margin-bottom: 15px; font-weight: 800;}
-
-.form-group { margin-bottom: 15px; }
-
-.form-group label {
-    display: block;
-    font-size: 12px;
-    font-weight: 700;
-    color: var(--text-gray);
-    margin-bottom: 5px;
-}
-
-.form-group input, .form-group select {
-    width: 100%;
-    box-sizing: border-box;
-    background: #0f172a;
-    border: 1px solid var(--border-color);
-    color: #fff;
-    padding: 10px;
-    border-radius: 6px;
-}
-
-.admin-btn {
-    width: 100%;
-    background: #00b4d8;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 6px;
-    font-weight: 800;
-    cursor: pointer;
-    margin-bottom: 10px;
-    transition: 0.2s;
-    text-transform: uppercase;
-    font-size: 12px;
-}
-
-.admin-btn:hover { background: #0096c7; box-shadow: 0 0 10px rgba(0, 180, 216, 0.3); }
-.delete-btn { background: #da3633; }
-.delete-btn:hover { background: #f85149; }
-
-/* MODAL WINDOW */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(3, 7, 18, 0.85);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-}
-
-.modal-overlay.active { opacity: 1; }
-
-.modal-card {
-    background: #0b1528;
-    border: 1px solid rgba(56, 189, 248, 0.2);
-    width: 380px;
-    padding: 30px;
-    border-radius: 16px;
-    position: relative;
-    box-shadow: 0 10px 40px rgba(0, 180, 216, 0.15);
-}
-
-.modal-close {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: #0f172a;
-    border: none;
-    color: var(--text-gray);
-    font-size: 14px;
-    font-weight: 800;
-    cursor: pointer;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid rgba(56, 189, 248, 0.1);
-}
-
-.avatar-container {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 15px;
-}
-
-.modal-skin {
-    width: 100px;
-    height: 100px;
-    border-radius: 12px;
-    border: 2px solid rgba(56, 189, 248, 0.3);
-    background: #0f172a;
-    display: block;
-    box-shadow: 0 0 20px rgba(0, 180, 216, 0.2);
-}
-
-.modal-nick {
-    font-size: 28px;
-    font-weight: 900;
-    text-align: center;
-    margin-bottom: 6px;
-}
-
-.role-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 4px;
-}
-
-.modal-role {
-    font-size: 13px;
-    font-weight: 800;
-    color: #fff;
-    background: #f85149;
-    padding: 4px 10px;
-    border-radius: 6px;
-    display: inline-block;
-}
-
-.modal-region {
-    font-size: 12px;
-    color: var(--text-gray);
-    font-weight: 700;
-    text-align: center;
-    text-transform: uppercase;
-}
-
-.modal-section-title {
-    font-size: 12px;
-    font-weight: 900;
-    color: var(--text-gray);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: left;
-    margin: 24px 0 10px 0;
-}
-
-/* POSITION BLOCK */
-.modal-box {
-    background: #0f172a;
-    border: 1px solid rgba(56, 189, 248, 0.1);
-    border-radius: 10px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.modal-rank-num {
-    font-size: 36px;
-    font-weight: 900;
-    color: #fff;
-}
-
-.modal-box-right {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.modal-rank-title {
-    font-size: 13px;
-    font-weight: 800;
-    color: #ffca28;
-    text-transform: uppercase;
-}
-
-.modal-points {
-    font-size: 12px;
-    color: var(--text-gray);
-    font-weight: 700;
-}
-
-/* TIERS GRAPHS */
-.modal-tiers-grid {
-    background: #0f172a;
-    border: 1px solid rgba(56, 189, 248, 0.1);
-    border-radius: 10px;
-    padding: 16px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-}
-
-.modal-tier-item {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    background: #0b1528;
-    padding: 5px 8px;
-    border-radius: 6px;
-    border: 1px solid #1e293b;
-}
-
-.modal-mode-icon img {
-    width: 14px;
-    height: 14px;
-    display: block;
-}
-
-/* STYLES FOR SMOOTH TABLE TRANSITIONS */
-.fade-in {
-    opacity: 1;
-    transition: opacity 0.2s ease-in-out;
-}
-
-.fade-out {
-    opacity: 0;
-}
+const sBar = document.getElementById('searchBar');
+if (sBar) sBar.addEventListener('input', renderTable);
+renderTable();
