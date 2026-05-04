@@ -32,7 +32,7 @@ if (modeSelect) {
     });
 }
 
-// ЛОГИКА АВТОРИЗАЦИИ
+// ЛОГИКА АВТОРИЗАЦИИ ПО КЛАВИШЕ ~ / Ё
 document.addEventListener('keydown', function(e) {
     if (e.code === 'Backquote') {
         const panel = document.getElementById('adminPanel');
@@ -241,4 +241,55 @@ function openProfile(nick) {
     const grid = document.getElementById('modalTiersGrid');
     if (grid) {
         grid.innerHTML = '';
-        modesList.forEach(m
+        modesList.forEach(m => {
+            const t = player.tiers[m];
+            if (t !== 'NONE') {
+                grid.innerHTML += `<div class="modal-tier-item"><div class="modal-mode-icon"><img src="${modeIcons[m]}" alt=""></div><span class="tier-badge ${t}">${t}</span></div>`;
+            }
+        });
+        if (grid.innerHTML === '') grid.innerHTML = '<span style="color: #7b8394; font-size: 13px; font-weight: 700;">No tiers assigned</span>';
+    }
+
+    const overlay = document.getElementById('profileModal');
+    if (overlay) { overlay.style.display = 'flex'; setTimeout(() => { overlay.classList.add('active'); }, 10); }
+}
+
+function closeModalDirect() {
+    const overlay = document.getElementById('profileModal');
+    if (overlay) { overlay.classList.remove('active'); setTimeout(() => { overlay.style.display = 'none'; }, 200); }
+}
+
+function closeModal(e) { if (e.target.className.includes('modal-overlay')) closeModalDirect(); }
+
+function renderTable() {
+    const tbody = document.getElementById('leaderboardBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    
+    const searchBar = document.getElementById('searchBar');
+    const searchVal = searchBar ? searchBar.value.toLowerCase() : '';
+    let displayPlayers = players.filter(p => p.nick.toLowerCase().includes(searchVal));
+
+    if (currentMode === 'overall') { 
+        displayPlayers.sort((a, b) => calculatePlayerPoints(b) - calculatePlayerPoints(a)); 
+    } else { 
+        displayPlayers = displayPlayers.filter(p => p.tiers[currentMode] !== 'NONE'); 
+        displayPlayers.sort((a, b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]); 
+    }
+
+    displayPlayers.forEach((player, index) => {
+        const tr = document.createElement('tr');
+        const points = calculatePlayerPoints(player);
+        let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
+                
+        const lowerNick = player.nick.toLowerCase();
+
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        
+        tbody.appendChild(tr);
+    });
+}
+
+const sBar = document.getElementById('searchBar');
+if (sBar) sBar.addEventListener('input', renderTable);
+renderTable();
