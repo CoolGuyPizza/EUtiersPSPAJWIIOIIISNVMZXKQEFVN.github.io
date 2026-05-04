@@ -134,14 +134,13 @@ td {
     color: #388bfd;
 }
 
-/* Головы в таблице */
+/* Иконки голов в таблице */
 .css-head {
     width: 32px;
     height: 32px;
     border-radius: 6px;
     background-repeat: no-repeat;
-    background-size: 256px 128px;
-    background-position: -32px -32px;
+    background-size: cover;
     image-rendering: pixelated;
     background-color: #1a1e29;
 }
@@ -299,13 +298,13 @@ td {
     margin-bottom: 15px;
 }
 
+/* Скин в модальном окне */
 .modal-skin {
-    width: 120px;
-    height: 180px;
-    border-radius: 12px;
-    border: 2px solid var(--border-color);
-    background: #1a1e29;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
     display: block;
+    object-fit: cover;
 }
 
 .modal-nick {
