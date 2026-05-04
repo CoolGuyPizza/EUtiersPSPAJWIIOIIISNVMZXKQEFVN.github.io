@@ -134,7 +134,7 @@ td {
     color: #388bfd;
 }
 
-/* СТАБИЛИЗИРОВАННАЯ КРУГЛАЯ ГОЛОВА В ТАБЛИЦЕ */
+/* Головы в таблице */
 .css-head {
     width: 32px;
     height: 32px;
@@ -299,7 +299,6 @@ td {
     margin-bottom: 15px;
 }
 
-/* 3D СЕТКА В МОДАЛЬНОМ ОКНЕ */
 .modal-skin {
     width: 120px;
     height: 180px;
