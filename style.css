@@ -139,7 +139,19 @@ td {
     height: 32px;
     border-radius: 6px;
     background: #1a1e29;
-    image-rendering: pixelated;
+    image-rendering: pixelated; /* Делает иконку четкой */
+}
+
+/* НОВЫЙ КЛАСС ДЛЯ ГЕНЕРАЦИИ ГОЛОВЫ ИЗ РАЗВЕРТКИ */
+.css-head {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background-repeat: no-repeat;
+    background-size: 256px 128px; /* Растягивает скин в 4 раза */
+    background-position: -32px -32px; /* Фокусируется на лице */
+    image-rendering: pixelated; /* Сохраняет кубичность пикселей */
+    background-color: #1a1e29;
 }
 
 .player-name {
@@ -296,12 +308,12 @@ td {
 }
 
 .modal-skin {
-    height: 180px; /* Сделали выше под скин во весь рост */
+    height: 120px;
     width: 120px;
     border-radius: 12px;
     border: 2px solid var(--border-color);
     background: #1a1e29;
-    image-rendering: pixelated;
+    image-rendering: pixelated; /* Делает крупную картинку четкой */
 }
 
 .modal-nick {
