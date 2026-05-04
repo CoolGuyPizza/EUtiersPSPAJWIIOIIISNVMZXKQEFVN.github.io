@@ -106,12 +106,12 @@ function openProfile(nick) {
     document.getElementById('modalPoints').textContent = `(${points} points)`;
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
-    const skinImg = document.getElementById('modalImg');
+        const skinImg = document.getElementById('modalImg');
     if (skinImg) {
-        skinImg.src = 'https://mc-heads.net' + player.nick + '/180';
+        skinImg.src = 'https://crafatar.com' + player.nick + '?scale=4';
         skinImg.onerror = function() {
             skinImg.onerror = null;
-            skinImg.src = 'https://mc-heads.netSteve/180';
+            skinImg.src = 'https://crafatar.comSteve?scale=4';
         };
     }
 
@@ -159,7 +159,7 @@ function renderTable() {
         const points = calculatePlayerPoints(player);
         let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
         
-        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://mc-heads.net' + player.nick + '/32" alt="' + player.nick + '" onerror="this.onerror=null;this.src=\'https://mc-heads.netSteve/32\';"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://crafatar.com' + player.nick + '?size=32" alt="' + player.nick + '" onerror="this.onerror=null;this.src=\'https://crafatar.comSteve?size=32\';"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
     });
