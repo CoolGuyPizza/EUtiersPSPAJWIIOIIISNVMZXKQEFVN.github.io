@@ -85,8 +85,8 @@
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
             
             <div class="avatar-container">
-                <!-- 3D-скин во весь рост -->
-                <img id="modalImg" class="modal-skin" src="" alt="Skin">
+                <!-- Холст для сборки 3D-модели человечка -->
+                <canvas id="skin_container" class="modal-skin"></canvas>
             </div>
 
             <div class="modal-nick" id="modalNick">PlayerName</div>
@@ -113,6 +113,9 @@
         </div>
     </div>
 
-    <script src="script.js?v=23234"></script>
+    <!-- 1. Сначала подключаем 3D-библиотеку -->
+    <script src="https://jsdelivr.net"></script>
+    <!-- 2. Затем подключаем твой скрипт -->
+    <script src="script.js?v=999222"></script>
 </body>
 </html>
