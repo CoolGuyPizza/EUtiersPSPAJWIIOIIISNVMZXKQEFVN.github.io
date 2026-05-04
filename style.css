@@ -1,20 +1,23 @@
 :root {
-    --bg-color: #0b0d13;
-    --card-bg: #151922;
+    /* Цвета изменены на глубоководные морские оттенки */
+    --bg-color: #030712;
+    --card-bg: #0b1528;
     --text-color: #ffffff;
-    --text-gray: #7b8394;
-    --accent: #ff4a4a;
-    --border-color: #1e2432;
-    --box-inner-bg: #1a1e29;
+    --text-gray: #64748b;
+    --accent: #00b4d8;
+    --border-color: #1e293b;
+    --box-inner-bg: #0f172a;
 }
 
 body {
-    background-color: var(--bg-color);
+    /* Фоновый градиент имитирует погружение на глубину */
+    background: linear-gradient(to bottom, #0f172a 0%, #030712 100%);
     color: var(--text-color);
     font-family: 'Inter', -apple-system, sans-serif;
     margin: 0;
     padding: 20px;
     letter-spacing: -0.02em;
+    min-height: 100vh;
 }
 
 /* СТИЛИ ДЛЯ ШАПКИ И БОЛЬШОГО ГРАДИЕНТНОГО ЛОГОТИПА */
@@ -24,9 +27,10 @@ body {
     background: var(--card-bg);
     padding: 20px 24px;
     border-radius: 12px;
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(56, 189, 248, 0.2); /* Бирюзовая граница */
     display: flex;
     align-items: center;
+    box-shadow: 0 4px 20px rgba(0, 180, 216, 0.1); /* Мягкое свечение */
 }
 
 .logo {
@@ -48,7 +52,8 @@ body {
     background: var(--card-bg);
     padding: 24px;
     border-radius: 12px;
-    border: 1px solid var(--border-color);
+    border: 1px solid rgba(56, 189, 248, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
 }
 
 .header-row {
@@ -67,7 +72,7 @@ h1 {
 }
 
 input[type="text"], input[type="password"] {
-    background: #1a1e29;
+    background: var(--box-inner-bg);
     border: 1px solid var(--border-color);
     color: #fff;
     padding: 12px 16px;
@@ -79,8 +84,9 @@ input[type="text"], input[type="password"] {
 }
 
 input[type="text"]:focus, input[type="password"]:focus {
-    border-color: #388bfd;
+    border-color: #00b4d8;
     outline: none;
+    box-shadow: 0 0 10px rgba(0, 180, 216, 0.3);
 }
 
 /* NAVIGATION */
@@ -92,8 +98,8 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 .mode-btn {
-    background: #151922;
-    border: 1px solid var(--border-color);
+    background: #0b1528;
+    border: 1px solid rgba(56, 189, 248, 0.1);
     color: var(--text-gray);
     padding: 12px 18px;
     border-radius: 10px;
@@ -114,9 +120,10 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 .mode-btn:hover, .mode-btn.active {
-    background: #1a1e29;
+    background: #112240;
     color: #fff;
-    border-color: #388bfd;
+    border-color: #00b4d8;
+    box-shadow: 0 0 15px rgba(0, 180, 216, 0.2);
 }
 
 /* TABLE */
@@ -137,7 +144,7 @@ th {
 
 td {
     padding: 16px 12px;
-    border-bottom: 1px solid #1a1e29;
+    border-bottom: 1px solid rgba(56, 189, 248, 0.05);
     font-size: 14px;
     vertical-align: middle;
 }
@@ -156,7 +163,7 @@ td {
 }
 
 .player-cell:hover .player-name {
-    color: #388bfd;
+    color: #00b4d8;
 }
 
 /* Table heads (cut from skin) */
@@ -168,7 +175,7 @@ td {
     background-size: 256px 128px;
     background-position: -32px -32px;
     image-rendering: pixelated;
-    background-color: #1a1e29;
+    background-color: var(--box-inner-bg);
 }
 
 .player-name {
@@ -186,12 +193,13 @@ td {
 }
 
 .region-badge {
-    background: #1a1e29;
+    background: #0f172a;
     padding: 5px 8px;
     border-radius: 6px;
     font-weight: 800;
     font-size: 11px;
-    color: #58a6ff;
+    color: #00b4d8;
+    border: 1px solid rgba(0, 180, 216, 0.2);
 }
 
 .tiers-row {
@@ -215,20 +223,21 @@ td {
 .HT3 { background: #238636; } .LT3 { background: #2ea043; }
 .HT4 { background: #1f6feb; } .LT4 { background: #388bfd; }
 .HT5 { background: #8957e5; } .LT5 { background: #a371f7; }
-.NONE { background: #30363d; color: var(--text-gray); }
+.NONE { background: #334155; color: var(--text-gray); }
 
 /* ADMIN PANEL */
 .admin-panel {
     position: fixed;
     top: 20px;
     right: 20px;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
+    background: #0b1528;
+    border: 1px solid #1e293b;
     padding: 20px;
     border-radius: 12px;
     width: 300px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
 .admin-panel h3 { margin-top: 0; font-size: 16px; margin-bottom: 15px; font-weight: 800;}
@@ -246,7 +255,7 @@ td {
 .form-group input, .form-group select {
     width: 100%;
     box-sizing: border-box;
-    background: #1a1e29;
+    background: #0f172a;
     border: 1px solid var(--border-color);
     color: #fff;
     padding: 10px;
@@ -255,7 +264,7 @@ td {
 
 .admin-btn {
     width: 100%;
-    background: #238636;
+    background: #00b4d8;
     color: #fff;
     border: none;
     padding: 12px;
@@ -268,7 +277,7 @@ td {
     font-size: 12px;
 }
 
-.admin-btn:hover { background: #2ea043; }
+.admin-btn:hover { background: #0096c7; box-shadow: 0 0 10px rgba(0, 180, 216, 0.3); }
 .delete-btn { background: #da3633; }
 .delete-btn:hover { background: #f85149; }
 
@@ -279,7 +288,7 @@ td {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(3, 7, 18, 0.85);
     display: none;
     justify-content: center;
     align-items: center;
@@ -291,19 +300,20 @@ td {
 .modal-overlay.active { opacity: 1; }
 
 .modal-card {
-    background: #11141c;
-    border: 1px solid var(--border-color);
+    background: #0b1528;
+    border: 1px solid rgba(56, 189, 248, 0.2);
     width: 380px;
     padding: 30px;
     border-radius: 16px;
     position: relative;
+    box-shadow: 0 10px 40px rgba(0, 180, 216, 0.15);
 }
 
 .modal-close {
     position: absolute;
     top: 15px;
     right: 15px;
-    background: #1a1e29;
+    background: #0f172a;
     border: none;
     color: var(--text-gray);
     font-size: 14px;
@@ -315,6 +325,7 @@ td {
     display: flex;
     align-items: center;
     justify-content: center;
+    border: 1px solid rgba(56, 189, 248, 0.1);
 }
 
 .avatar-container {
@@ -328,9 +339,10 @@ td {
     width: 100px;
     height: 100px;
     border-radius: 12px;
-    border: 2px solid var(--border-color);
-    background: #1a1e29;
+    border: 2px solid rgba(56, 189, 248, 0.3);
+    background: #0f172a;
     display: block;
+    box-shadow: 0 0 20px rgba(0, 180, 216, 0.2);
 }
 
 .modal-nick {
@@ -376,8 +388,8 @@ td {
 
 /* POSITION BLOCK */
 .modal-box {
-    background: #1a1e29;
-    border: 1px solid var(--border-color);
+    background: #0f172a;
+    border: 1px solid rgba(56, 189, 248, 0.1);
     border-radius: 10px;
     padding: 16px;
     display: flex;
@@ -412,8 +424,8 @@ td {
 
 /* TIERS GRAPHS */
 .modal-tiers-grid {
-    background: #1a1e29;
-    border: 1px solid var(--border-color);
+    background: #0f172a;
+    border: 1px solid rgba(56, 189, 248, 0.1);
     border-radius: 10px;
     padding: 16px;
     display: flex;
@@ -425,10 +437,10 @@ td {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #11141c;
+    background: #0b1528;
     padding: 5px 8px;
     border-radius: 6px;
-    border: 1px solid #1e2432;
+    border: 1px solid #1e293b;
 }
 
 .modal-mode-icon img {
