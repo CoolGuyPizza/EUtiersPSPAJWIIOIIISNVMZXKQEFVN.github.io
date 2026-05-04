@@ -140,7 +140,6 @@ function renderTable() {
         tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://minotar.net' + player.nick + '/32" alt="' + player.nick + '"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         tbody.appendChild(tr);
     });
-}
 
 const sBar = document.getElementById('searchBar');
 if (sBar) sBar.addEventListener('input', renderTable);
