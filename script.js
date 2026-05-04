@@ -53,7 +53,6 @@ function calculatePlayerPoints(player) {
     return total;
 }
 
-// Измененная функция переключения режимов с эффектом плавности
 function switchMode(mode) {
     const tbody = document.getElementById('leaderboardBody');
     currentMode = mode;
@@ -64,13 +63,12 @@ function switchMode(mode) {
     const headerTitle = document.getElementById('tier-header-title');
     if (headerTitle) headerTitle.textContent = (mode === 'overall') ? 'ALL TIERS' : 'TIER';
 
-    // Эффект плавного исчезновения и появления
     if (tbody) {
         tbody.classList.add('fade-out');
         setTimeout(() => {
             renderTable();
             tbody.classList.remove('fade-out');
-        }, 200); // 200 мс соответствует скорости анимации в CSS
+        }, 200);
     } else {
         renderTable();
     }
@@ -107,6 +105,78 @@ function deletePlayerFromAdmin() {
     renderTable();
 }
 
+// ЭТА ФУНКЦИЯ СОБИРАЕТ СКИН ИЗ ЧАСТЕЙ
+function drawSkinToCanvas(imgSource, container) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16;
+    canvas.height = 32;
+    canvas.style.width = '100px';
+    canvas.style.height = '180px';
+    canvas.style.imageRendering = 'pixelated';
+    canvas.className = 'modal-skin';
+    
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imgSource;
+    
+    img.onload = function() {
+        ctx.imageSmoothingEnabled = false;
+        
+        // Голова
+        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8);
+        // Шлем (оверлей головы)
+        ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8);
+        
+        // Тело
+        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12);
+        // Оверлей тела
+        ctx.drawImage(img, 20, 36, 8, 12, 4, 8, 8, 12);
+        
+        // Левая рука
+        ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12);
+        // Оверлей левой руки
+        ctx.drawImage(img, 52, 52, 4, 12, 0, 8, 4, 12);
+        
+        // Правая рука (зеркалим левую для старых скинов 64х32)
+        if (img.height === 32) {
+            ctx.save();
+            ctx.translate(16, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12);
+            ctx.restore();
+        } else {
+            ctx.drawImage(img, 36, 52, 4, 12, 12, 8, 4, 12);
+            ctx.drawImage(img, 52, 68, 4, 12, 12, 8, 4, 12);
+        }
+        
+        // Левая нога
+        ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12);
+        // Оверлей левой ноги
+        ctx.drawImage(img, 4, 36, 4, 12, 4, 20, 4, 12);
+        
+        // Правая нога (зеркалим левую для старых скинов 64х32)
+        if (img.height === 32) {
+            ctx.save();
+            ctx.translate(16, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12);
+            ctx.restore();
+        } else {
+            ctx.drawImage(img, 20, 52, 4, 12, 8, 20, 4, 12);
+            ctx.drawImage(img, 4, 68, 4, 12, 8, 20, 4, 12);
+        }
+        
+        container.appendChild(canvas);
+    };
+    
+    img.onerror = function() {
+        if (imgSource !== 'steve.png') {
+            container.innerHTML = '';
+            drawSkinToCanvas('steve.png', container);
+        }
+    };
+}
+
 function openProfile(nick) {
     const player = players.find(p => p.nick === nick);
     if (!player) return;
@@ -123,23 +193,10 @@ function openProfile(nick) {
     const skinContainer = document.getElementById("skin_container");
     if (skinContainer) {
         skinContainer.innerHTML = '';
-        
-        const img = document.createElement('img');
-        img.className = 'modal-skin';
-        img.style.width = '100px';
-        img.style.height = '100px';
-        img.style.objectFit = 'contain';
-
         const lowerNick = player.nick.toLowerCase();
         
-        img.src = `${lowerNick}.png`;
-        
-        img.onerror = function() {
-            img.onerror = null;
-            img.src = 'steve.png';
-        };
-
-        skinContainer.appendChild(img);
+        // Вызываем сборщик скина
+        drawSkinToCanvas(`${lowerNick}.png`, skinContainer);
     }
 
     const grid = document.getElementById('modalTiersGrid');
