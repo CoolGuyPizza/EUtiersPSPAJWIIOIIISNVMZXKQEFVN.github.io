@@ -105,27 +105,46 @@ function openProfile(nick) {
     document.getElementById('modalRank').textContent = (sorted.findIndex(p => p.nick === nick) + 1) + '.';
     document.getElementById('modalPoints').textContent = `(${points} points)`;
     document.getElementById('modalRegion').textContent = player.region || 'NA';
-    
+
     const skinContainer = document.getElementById("skin_container");
     if (skinContainer) {
-        // Очищаем старое содержимое
         skinContainer.innerHTML = '';
         
-        // Создаем тег картинки для вывода 3D-человечка
         const img = document.createElement('img');
         img.className = 'modal-skin';
         img.style.width = '120px';
         img.style.height = '180px';
-        
-        // Берем готовый 3D-кадр из сети по нику
-        img.src = 'https://wsrv.nl' + player.nick + '/100';
-        
-        // Заглушка, если ник пиратский или сервис недоступен
+        img.style.objectFit = 'contain';
+
+        const lowerNick = player.nick.toLowerCase();
+        const localSkinPath = `${lowerNick}.png`;
+
+        // Логика проверки файла на твоем сервере
+        fetch(localSkinPath, { method: 'HEAD' })
+        .then(res => {
+            if (res.ok) {
+                // Если файл найден, отправляем его в API для 3D рендера
+                const siteUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
+                const fullSkinUrl = siteUrl + localSkinPath;
+                img.src = `https://mineskin.eu{player.nick}?skin=${encodeURIComponent(fullSkinUrl)}`;
+            } else {
+                loadSteveSkin(img);
+            }
+        })
+        .catch(() => {
+            loadSteveSkin(img);
+        });
+
+        function loadSteveSkin(imageTag) {
+            // Как альтернатива - можно поставить сюда просто ссылку на steve.png
+            imageTag.src = 'https://surgeplay.com';
+        }
+
         img.onerror = function() {
             img.onerror = null;
-            img.src = 'https://wsrv.nlSteve/100';
+            loadSteveSkin(img);
         };
-        
+
         skinContainer.appendChild(img);
     }
 
@@ -175,7 +194,6 @@ function renderTable() {
         
         const lowerNick = player.nick.toLowerCase();
         
-        // В ТАБЛИЦЕ: Иконки берутся из твоих файлов на GitHub
         tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
