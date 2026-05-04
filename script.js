@@ -136,13 +136,15 @@ function openProfile(nick) {
     document.getElementById('modalPoints').textContent = `(${points} points)`;
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
-    const skinImg = document.getElementById('modalImg');
+        const skinImg = document.getElementById('modalImg');
     
     if (skinImg) {
-        skinImg.src = 'https://mc-heads.net' + player.nick + '/350';
+        // Безопасное склеивание ссылки для 3D-модели
+        skinImg.src = 'https://minotar.net' + player.nick + '/100';
+        
         skinImg.onerror = function() {
             skinImg.onerror = null;
-            skinImg.src = 'https://mc-heads.netSteve/350';
+            skinImg.src = 'https://minotar.netSteve/100';
         };
     }
 
@@ -221,7 +223,7 @@ function renderTable() {
             <td class="rank-num">${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')"> 
-                        <img src="https://mc-heads.net{player.nick}/32" alt="${player.nick}" onerror="this.onerror=null;this.src='https://mc-heads.net';">
+                        <img src="https://minotar.net/avatar/' + player.nick + '/32" alt="' + player.nick + '" onerror="this.onerror=null;this.src='https://minotar.net';">
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
