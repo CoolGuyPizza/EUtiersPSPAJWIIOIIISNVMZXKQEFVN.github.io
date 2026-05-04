@@ -63,7 +63,9 @@ function calculatePlayerPoints(player) {
 
 function switchMode(mode) {
     currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    if (navCont) {
+        navCont.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    }
     if (event && event.currentTarget) {
         event.currentTarget.classList.add('active');
     }
@@ -137,11 +139,10 @@ function openProfile(nick) {
     const skinImg = document.getElementById('modalImg');
     
     if (skinImg) {
-        // Безопасное склеивание ссылки для 3D-модели
-        skinImg.src = 'https://surgeplay.com' + player.nick;
+        skinImg.src = 'https://mc-heads.net' + player.nick + '/350';
         skinImg.onerror = function() {
             skinImg.onerror = null;
-            skinImg.src = 'https://surgeplay.comSteve';
+            skinImg.src = 'https://mc-heads.netSteve/350';
         };
     }
 
@@ -216,7 +217,6 @@ function renderTable() {
             tierCellHTML = `<span class="tier-badge ${t}">${t}</span>`;
         }
 
-        // Тут мы полностью избавились от `${}` в теге <img>, чтобы браузер не путался
         tr.innerHTML = `
             <td class="rank-num">${index + 1}</td>
             <td>
