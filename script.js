@@ -53,13 +53,27 @@ function calculatePlayerPoints(player) {
     return total;
 }
 
+// Измененная функция переключения режимов с эффектом плавности
 function switchMode(mode) {
+    const tbody = document.getElementById('leaderboardBody');
     currentMode = mode;
+    
     if (navCont) navCont.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
     if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    
     const headerTitle = document.getElementById('tier-header-title');
     if (headerTitle) headerTitle.textContent = (mode === 'overall') ? 'ALL TIERS' : 'TIER';
-    renderTable();
+
+    // Эффект плавного исчезновения и появления
+    if (tbody) {
+        tbody.classList.add('fade-out');
+        setTimeout(() => {
+            renderTable();
+            tbody.classList.remove('fade-out');
+        }, 200); // 200 мс соответствует скорости анимации в CSS
+    } else {
+        renderTable();
+    }
 }
 
 function savePlayer(event) {
@@ -112,13 +126,17 @@ function openProfile(nick) {
         
         const img = document.createElement('img');
         img.className = 'modal-skin';
+        img.style.width = '100px';
+        img.style.height = '100px';
+        img.style.objectFit = 'contain';
+
+        const lowerNick = player.nick.toLowerCase();
         
-        // Как на скрине mctiers: 3D рендер головы и плеч с небольшим поворотом
-        img.src = `https://surgeplay.com{player.nick}`;
+        img.src = `${lowerNick}.png`;
         
         img.onerror = function() {
             img.onerror = null;
-            img.src = 'https://surgeplay.com';
+            img.src = 'steve.png';
         };
 
         skinContainer.appendChild(img);
@@ -168,8 +186,9 @@ function renderTable() {
         const points = calculatePlayerPoints(player);
         let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
                 
-        // В ТАБЛИЦЕ: Головы берутся из интернета по нику. Если ника нет, сервис сам выдаст Стива
-        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'https://crafatar.com' + player.nick + '?size=32&overlay=true\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        const lowerNick = player.nick.toLowerCase();
+
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><div class="css-head" style="background-image: url(\'' + lowerNick + '.png\'), url(\'steve.png\');"></div><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
     });
