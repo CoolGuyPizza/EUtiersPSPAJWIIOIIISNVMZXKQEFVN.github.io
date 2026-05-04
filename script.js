@@ -93,6 +93,9 @@ function deletePlayerFromAdmin() {
     renderTable();
 }
 
+// Глобальная переменная для хранения текущей сцены
+let skinViewer = null;
+
 function openProfile(nick) {
     const player = players.find(p => p.nick === nick);
     if (!player) return;
@@ -106,17 +109,27 @@ function openProfile(nick) {
     document.getElementById('modalPoints').textContent = `(${points} points)`;
     document.getElementById('modalRegion').textContent = player.region || 'NA';
     
-    const skinImg = document.getElementById('modalImg');
-    if (skinImg) {
-        const lowerNick = player.nick.toLowerCase();
-        // Ищем локальный файл с ником игрока
-        skinImg.src = lowerNick + '.png';
-        
-        // Если файла нет, ставим дефолтного Стива
-        skinImg.onerror = function() {
-            skinImg.onerror = null;
-            skinImg.src = 'steve.png';
-        };
+    const lowerNick = player.nick.toLowerCase();
+    const canvasEl = document.getElementById("skin_container");
+
+    if (canvasEl) {
+        // Если 3D просмотрщик еще не создавался - создаем
+        if (!skinViewer) {
+            skinViewer = new skinview3d.SkinViewer({
+                canvas: canvasEl,
+                width: 120,
+                height: 180
+            });
+            skinViewer.autoRotate = true;
+            skinViewer.animation = new skinview3d.WalkingAnimation();
+            skinViewer.animation.speed = 1.0;
+        }
+
+        // Загружаем локальный скин игрока
+        skinViewer.loadSkin(lowerNick + ".png").catch(() => {
+            // Если файла нет на гитхабе - молча загружаем Стива
+            skinViewer.loadSkin("steve.png");
+        });
     }
 
     const grid = document.getElementById('modalTiersGrid');
