@@ -108,11 +108,11 @@ function openProfile(nick) {
     
     const skinImg = document.getElementById('modalImg');
     if (skinImg) {
-        // Проксируем 3D-скин с Crafatar через стабильный сервис wsrv.nl
-        skinImg.src = 'https://wsrv.nl' + player.nick + '?scale=4';
+        // Прямой запрос без сложных прокси
+        skinImg.src = 'https://crafthead.net' + player.nick;
         skinImg.onerror = function() {
             skinImg.onerror = null;
-            skinImg.src = 'https://wsrv.nlSteve?scale=4';
+            skinImg.src = 'https://crafthead.netSteve';
         };
     }
 
@@ -160,8 +160,8 @@ function renderTable() {
         const points = calculatePlayerPoints(player);
         let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
         
-        // Проксируем маленькие аватары с Crafatar через wsrv.nl
-        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://wsrv.nl' + player.nick + '?size=32" alt="' + player.nick + '"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
+        // Прямой запрос без сложных прокси
+        tr.innerHTML = '<td>' + (index + 1) + '</td><td><div class="player-cell" onclick="openProfile(\'' + player.nick + '\')"><img src="https://crafthead.net' + player.nick + '" alt="' + player.nick + '"><div><span class="player-name">' + player.nick + '</span><span class="player-title">' + getRankTitle(points) + ' (' + points + ' pts)</span></div></div></td><td><span class="region-badge">' + (player.region || 'NA') + '</span></td><td>' + tierCellHTML + '</td>';
         
         tbody.appendChild(tr);
     });
