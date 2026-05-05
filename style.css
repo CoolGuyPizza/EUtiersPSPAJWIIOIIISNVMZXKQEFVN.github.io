@@ -182,15 +182,13 @@ td:last-child { border-radius: 0 10px 10px 0; }
     color: #00b4d8;
 }
 
-.css-head {
+.css-head-canvas {
     width: 32px;
     height: 32px;
+    image-rendering: pixelated; /* Делает голову четкой, а не размытой */
     border-radius: 4px;
-    background-color: #1e293b;
-    image-rendering: pixelated; /* Чтобы голова была четкой */
+    background: #1e293b;
     flex-shrink: 0;
-    background-repeat: no-repeat;
-    background-position: center;
 }
 
 .player-cell {
