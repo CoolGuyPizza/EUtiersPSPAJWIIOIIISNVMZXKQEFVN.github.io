@@ -11,14 +11,16 @@ const modeIcons = {
 const pointsMapping = { 'HT1': 60, 'LT1': 45, 'HT2': 30, 'LT2': 20, 'HT3': 10, 'LT3': 6, 'HT4': 4, 'LT4': 3, 'HT5': 5, 'LT5': 1, 'NONE': 0 };
 const tierOrder = { 'HT1': 1, 'LT1': 2, 'HT2': 3, 'LT2': 4, 'HT3': 5, 'LT3': 6, 'HT4': 7, 'LT4': 8, 'HT5': 9, 'LT5': 10, 'NONE': 11 };
 
-// --- FIREBASE SYNC ---
-db.ref('players').on('value', (snapshot) => {
-    const data = snapshot.val();
-    players = data ? Object.values(data) : [];
-    renderTable();
-});
+// --- FIREBASE SYNC (Синхронизация с облаком) ---
+if (window.db) {
+    window.db.ref('players').on('value', (snapshot) => {
+        const data = snapshot.val();
+        players = data ? Object.values(data) : [];
+        renderTable();
+    });
+}
 
-// --- NAVIGATION & SELECTS ---
+// --- INITIALIZE UI ---
 const navCont = document.getElementById('modesNav');
 if (navCont) {
     let html = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
@@ -38,7 +40,7 @@ if (modeSelect) {
     });
 }
 
-// --- ADMIN FUNCTIONS ---
+// --- ADMIN CONTROLS ---
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Backquote') {
         if (!isAdmin) {
@@ -58,7 +60,7 @@ function tryLogin() {
         isAdmin = true; sessionStorage.setItem('isAdminAuth', 'true');
         closeLoginDirect();
         document.getElementById('adminPanel').style.display = 'block';
-    } else { alert('Wrong password!'); }
+    } else { alert('Wrong Credentials!'); }
 }
 
 function savePlayer(e) {
@@ -75,7 +77,7 @@ function savePlayer(e) {
     p.tiers[document.getElementById('mode-select').value] = document.getElementById('tier-select').value;
     p.region = document.getElementById('region-select').value;
 
-    db.ref('players/' + nick.toLowerCase()).set(p).then(() => {
+    window.db.ref('players/' + nick.toLowerCase()).set(p).then(() => {
         document.getElementById('nickname').value = '';
     });
 }
@@ -83,7 +85,7 @@ function savePlayer(e) {
 function deletePlayerFromAdmin() {
     if (!isAdmin) return;
     const nick = document.getElementById('nickname').value.trim();
-    if (nick) db.ref('players/' + nick.toLowerCase()).remove();
+    if (nick) window.db.ref('players/' + nick.toLowerCase()).remove();
 }
 
 function logoutAdmin() {
@@ -143,7 +145,7 @@ function renderTable() {
     });
 }
 
-// --- SKIN DRAWING ---
+// --- SKIN RENDERING ---
 function drawSkinToCanvas(imgSource, container) {
     const canvas = document.createElement('canvas');
     canvas.width = 16; canvas.height = 32;
