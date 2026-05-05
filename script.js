@@ -192,6 +192,13 @@ function switchMode(mode) {
 function renderTable() {
     const tbody = document.getElementById('leaderboardBody');
     if (!tbody) return;
+
+    // --- ДОБАВЬ ЭТИ СТРОКИ ---
+    tbody.classList.remove('fade-in-up'); // Сбрасываем старую анимацию
+    void tbody.offsetWidth;              // Магическая строчка (force reflow)
+    tbody.classList.add('fade-in-up');    // Запускаем новую
+    // -------------------------
+
     tbody.innerHTML = '';
     
     const searchVal = document.getElementById('searchBar').value.toLowerCase();
