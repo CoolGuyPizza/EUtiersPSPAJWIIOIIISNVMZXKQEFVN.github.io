@@ -4,11 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EUTIERS</title>
-    <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+
+    <!-- 1. ЗАГРУЖАЕМ БИБЛИОТЕКИ FIREBASE СНАЧАЛА -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+
+    <!-- 2. ИНИЦИАЛИЗИРУЕМ БАЗУ -->
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
+        authDomain: "://firebaseapp.com",
+        databaseURL: "https://firebaseio.com",
+        projectId: "eutiers",
+        storageBucket: "eutiers.firebasestorage.app",
+        messagingSenderId: "702553921523",
+        appId: "1:702553921523:web:49f526b38bfbe62f776486"
+      };
+      firebase.initializeApp(firebaseConfig);
+      window.db = firebase.database();
+    </script>
 </head>
 <body>
 
@@ -37,33 +55,10 @@
         </table>
     </div>
 
-    <!-- КРИТИЧЕСКИ ВАЖНЫЙ БЛОК: СНАЧАЛА БИБЛИОТЕКИ -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-
-    <!-- ПОТОМ ИНИЦИАЛИЗАЦИЯ -->
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
-        authDomain: "://firebaseapp.com",
-        databaseURL: "https://firebaseio.com",
-        projectId: "eutiers",
-        storageBucket: "eutiers.firebasestorage.app",
-        messagingSenderId: "702553921523",
-        appId: "1:702553921523:web:49f526b38bfbe62f776486"
-      };
-      
-      // Инициализируем Firebase
-      firebase.initializeApp(firebaseConfig);
-      // Принудительно делаем базу глобальной
-      window.db = firebase.database();
-      console.log("Firebase initialized successfully!");
-    </script>
-
-    <!-- И ТОЛЬКО В САМОМ КОНЦЕ ТВОЙ СКРИПТ -->
+    <!-- ТВОЙ СКРИПТ В КОНЦЕ -->
     <script src="script.js"></script>
 
-    <!-- ОСТАЛЬНЫЕ МОДАЛКИ (БЕЗ ИЗМЕНЕНИЙ) -->
+    <!-- ADMIN LOGIN MODAL -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
@@ -80,11 +75,9 @@
         </div>
     </div>
 
+    <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-            <h3>Control Panel</h3>
-            <button onclick="logoutAdmin()" class="delete-btn" style="padding: 5px 10px; font-size: 10px;">Logout</button>
-        </div>
+        <h3>Control Panel</h3>
         <div class="form-group">
             <label>Nickname:</label>
             <input type="text" id="nickname">
@@ -118,11 +111,12 @@
         <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete Player</button>
     </div>
 
+    <!-- PROFILE MODAL -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
             <div class="avatar-container"><div id="skin_container"></div></div>
-            <div class="modal-nick" id="modalNick">PlayerName</div>
+            <div class="modal-nick" id="modalNick">Player</div>
             <div class="role-wrapper"><div class="modal-role" id="modalRole">Rookie</div></div>
             <div class="modal-region" id="modalRegion">EU</div>
             <div class="modal-section-title">POSITION</div>
