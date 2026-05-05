@@ -186,12 +186,15 @@ td:last-child { border-radius: 0 10px 10px 0; }
     width: 32px;
     height: 32px;
     border-radius: 4px;
-    background-size: 800%; /* Увеличиваем скин, чтобы видеть только голову */
-    background-position: 12.5% 12.5%; /* Фокусируемся на области лица (8,8 пикселей) */
-    image-rendering: pixelated; /* Сохраняем пиксельность, чтобы не было мыла */
+    image-rendering: pixelated;
     flex-shrink: 0;
+    /* Увеличиваем скин в 8 раз (800%) */
+    background-size: 800% 800%, 800% 800%; 
+    /* Позиции: первая для шлема (40,8), вторая для лица (8,8) */
+    background-position: 93.75% 12.5%, 12.5% 12.5%; 
     background-repeat: no-repeat;
-    background-color: #1e293b; /* Фон, если картинка не загрузится */
+    background-color: #1e293b;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .player-cell {
