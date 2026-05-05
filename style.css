@@ -599,3 +599,42 @@ td:last-child { border-radius: 0 10px 10px 0; }
     height: 26px;
     pointer-events: none; /* Чтобы клик по картинке не мешал ссылке */
 }
+
+.activity-sidebar {
+    background: rgba(30, 41, 59, 0.4); /* Полупрозрачный фон */
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    backdrop-filter: blur(10px); /* Эффект матового стекла */
+}
+
+.sidebar-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: #64748b;
+    font-weight: 800;
+    margin-bottom: 15px;
+    letter-spacing: 1px;
+}
+
+.activity-item {
+    font-size: 13px;
+    margin-bottom: 12px;
+    border-left: 2px solid #38bdf8; /* Голубая полоска слева */
+    padding-left: 10px;
+}
+
+.act-nick { color: #fff; font-weight: 700; cursor: pointer; }
+.act-time { display: block; color: #475569; font-size: 11px; }
+
+.sidebar-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.05);
+    margin: 20px 0;
+}
+
+/* Добавь небольшое свечение иконкам тиров */
+.tier-badge {
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+}
