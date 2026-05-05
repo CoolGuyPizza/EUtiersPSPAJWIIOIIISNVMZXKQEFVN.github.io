@@ -89,41 +89,46 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 /* NAVIGATION (УЛУЧШЕННЫЕ ВКЛАДКИ) */
+/* ОБНОВЛЕННАЯ НАВИГАЦИЯ: Компактная и по центру */
 .nav-container {
     display: flex;
-    gap: 8px;
-    justify-content: center;
-    margin-bottom: 24px;
-    flex-wrap: wrap; /* Чтобы не вылезали за экран */
+    gap: 8px; /* Немного уменьшили расстояние между кнопками */
+    justify-content: center; /* Центрируем вкладки над таблицей */
+    max-width: 1200px; /* Ширина совпадает с контейнером лидерборда */
+    margin: 0 auto 24px auto;
+    flex-wrap: nowrap; /* Запрещаем перенос, чтобы они всегда были в ряд */
 }
 
 .mode-btn {
-    flex: 1; /* Все кнопки равны */
-    min-width: 90px; /* Минимальный порог, чтобы текст не сжимался */
+    flex: 0 1 100px; /* Кнопки не растягиваются бесконечно, максимум 100px */
     background: #0b1528;
     border: 1px solid rgba(56, 189, 248, 0.1);
     color: var(--text-gray);
-    padding: 12px 5px;
+    padding: 10px 4px; /* Уменьшили высоту и боковые отступы */
     border-radius: 10px;
     cursor: pointer;
-    font-size: 11px;
+    font-size: 10px; /* Компактный шрифт для компактных вкладок */
     font-weight: 800;
     text-transform: uppercase;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 5px;
     transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.mode-btn img { width: 22px; height: 22px; }
+.mode-btn img {
+    width: 18px; /* Уменьшили иконки, чтобы всё влезло */
+    height: 18px;
+}
 
 .mode-btn:hover, .mode-btn.active {
     background: #112240;
     color: #fff;
     border-color: #00b4d8;
     box-shadow: 0 4px 15px rgba(0, 180, 216, 0.2);
-    transform: translateY(-4px); /* Твое любимое подпрыгивание */
+    transform: translateY(-4px); /* Сохраняем подпрыгивание */
 }
 
 /* TABLE & PLAYER CARDS */
