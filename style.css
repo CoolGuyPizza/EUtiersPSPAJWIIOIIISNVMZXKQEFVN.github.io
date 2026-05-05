@@ -341,20 +341,18 @@ td:last-child { border-radius: 0 10px 10px 0; }
 }
 
 .avatar-container {
-    width: 100%;
     display: flex;
     justify-content: center;
-    margin-bottom: 15px;
+    align-items: center;
+    padding: 20px 0;
+    width: 100%;
 }
 
 .modal-skin {
-    width: 100px;
-    height: 180px;
-    border-radius: 12px;
-    border: 2px solid rgba(56, 189, 248, 0.3);
-    background: #0f172a;
     display: block;
-    box-shadow: 0 0 20px rgba(0, 180, 216, 0.2);
+    /* Убираем любые фиксы, которые могут ломать пропорции */
+    max-width: 100%;
+    object-fit: contain; 
 }
 
 .modal-nick {
