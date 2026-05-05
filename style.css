@@ -581,24 +581,24 @@ td:last-child { border-radius: 0 10px 10px 0; }
     pointer-events: none; /* Чтобы клик по картинке не мешал ссылке */
 }
 
-/* Класс, который запускает анимацию */
-.fade-in-up {
-    animation: fadeInUp 0.4s ease forwards;
-}
-
-/* Описание самой анимации */
+/* 1. Создаем саму анимацию */
 @keyframes fadeInUp {
-    from {
+    0% {
         opacity: 0;
-        transform: translateY(15px); /* Начинаем чуть ниже */
+        transform: translateY(15px);
     }
-    to {
+    100% {
         opacity: 1;
-        transform: translateY(0); /* Заканчиваем в нормальной позиции */
+        transform: translateY(0);
     }
 }
 
-/* Чтобы анимация работала плавно, добавим это самой таблице */
+/* 2. Класс, который ее запускает */
+.fade-in-up {
+    animation: fadeInUp 0.4s ease forwards !important;
+}
+
+/* 3. Подготовка таблицы */
 #leaderboardBody {
     will-change: transform, opacity;
 }
