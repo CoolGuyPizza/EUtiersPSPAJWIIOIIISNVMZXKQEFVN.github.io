@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUTIERS | Leaderboard</title>
+    <title>EUTIERS</title>
     <meta name="robots" content="noindex, nofollow">
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
@@ -22,84 +22,46 @@
         </a>
     </div>
 
-    <!-- НАВИГАЦИЯ -->
+    <!-- НАВИГАЦИЯ (РЕЖИМЫ) -->
     <div class="nav-container" id="modesNav"></div>
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
     <div class="container">
-        <div class="main-layout">
-            
-            <!-- ЛЕВАЯ ЧАСТЬ: ТАБЛИЦА -->
-            <div class="table-section">
-                <div class="header-row">
-                    <h1 id="tier-header-title">ALL TIERS</h1>
-                    <input type="text" id="searchBar" placeholder="Search player...">
-                </div>
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;">#</th>
-                            <th>PLAYER</th>
-                            <th style="width: 100px;">REGION</th>
-                            <th style="width: 150px;">TIERS</th>
-                        </tr>
-                    </thead>
-                    <tbody id="leaderboardBody" class="fade-in"></tbody>
-                </table>
-            </div>
-
-            <!-- ПРАВАЯ ЧАСТЬ: ЛЕНТА АКТИВНОСТИ -->
-            <div class="activity-sidebar">
-                <div class="sidebar-title">Recent Activity</div>
-                <div id="activityFeed">
-                    <!-- Заполняется через JS -->
-                </div>
-                
-                <div class="sidebar-divider"></div>
-                
-                <div class="sidebar-title">Season Info</div>
-                <div class="season-box">
-                    <div class="season-name">Season 1: Origins</div>
-                    <div class="season-status">Ends in: 24 days</div>
-                </div>
-            </div>
-
+        <div class="header-row">
+            <h1 id="tier-header-title">ALL TIERS</h1>
+            <input type="text" id="searchBar" placeholder="Search player...">
         </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>PLAYER</th>
+                    <th style="width: 100px;">REGION</th>
+                    <th style="width: 150px;">TIERS</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboardBody">
+                <!-- Строки появятся здесь -->
+            </tbody>
+        </table>
     </div>
 
-    <!-- МОДАЛКИ (Логин, Админка, Профиль) -->
-    <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
-        <div class="modal-card" onclick="event.stopPropagation()">
-            <button class="modal-close" onclick="closeLoginDirect()">✕</button>
-            <div class="modal-section-title">ADMIN LOGIN</div>
-            <div class="form-group">
-                <label>Username:</label>
-                <input type="text" id="adminUser">
-            </div>
-            <div class="form-group">
-                <label>Password:</label>
-                <input type="password" id="adminPass">
-            </div>
-            <button class="admin-btn" onclick="tryLogin()">Login</button>
-        </div>
-    </div>
-
+    <!-- АДМИН-ПАНЕЛЬ -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">Control Panel</h3>
-            <button onclick="logoutAdmin()" class="logout-link">Logout</button>
+            <button onclick="logoutAdmin()" style="background:none; border:none; color:#da3633; cursor:pointer; font-weight:800;">Logout</button>
         </div>
         <div class="form-group">
-            <label>Nickname:</label>
+            <label>Username:</label>
             <input type="text" id="nickname">
         </div>
         <div class="form-group">
             <label>Region:</label>
             <select id="region-select">
-                <option value="EU">EU</option><option value="NA">NA</option>
-                <option value="AS">AS</option><option value="AU">AU</option>
-                <option value="OC">OC</option>
+                <option value="EU">EU</option><option value="NA">NA</option><option value="AS">AS</option>
+                <option value="AU">AU</option><option value="OC">OC</option>
             </select>
         </div>
         <div class="form-group">
@@ -118,11 +80,12 @@
             </select>
         </div>
         <button class="admin-btn" onclick="savePlayer(event)">Save / Update</button>
-        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete</button>
+        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete Player</button>
         <hr class="admin-divider">
-        <button class="admin-btn download-btn" onclick="downloadJSON()">💾 Download JSON</button>
+        <button class="admin-btn download-btn" onclick="downloadJSON()">💾 Download players.json</button>
     </div>
 
+    <!-- ПРОФИЛЬ МОДАЛКА -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
@@ -132,7 +95,7 @@
             <div class="modal-region" id="modalRegion"></div>
             <div class="modal-section-title">POSITION</div>
             <div class="modal-box">
-                <div class="modal-box-left"><span class="modal-rank-num" id="modalRank">1.</span></div>
+                <div class="modal-box-left"><span class="modal-rank-num" id="modalRank"></span></div>
                 <div class="modal-box-right">
                     <span class="modal-rank-title">🏆 OVERALL</span>
                     <span class="modal-points" id="modalPoints"></span>
@@ -140,6 +103,21 @@
             </div>
             <div class="modal-section-title">TIERS</div>
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
+        </div>
+    </div>
+
+    <!-- ЛОГИН МОДАЛКА -->
+    <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeLoginDirect()">✕</button>
+            <div class="modal-section-title">ADMIN LOGIN</div>
+            <div class="form-group">
+                <label>User:</label><input type="text" id="adminUser">
+            </div>
+            <div class="form-group">
+                <label>Pass:</label><input type="password" id="adminPass">
+            </div>
+            <button class="admin-btn" onclick="tryLogin()">Login</button>
         </div>
     </div>
 
