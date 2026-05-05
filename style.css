@@ -510,61 +510,56 @@ td:last-child { border-radius: 0 10px 10px 0; }
 /* --- СТИЛИ ДЛЯ ШАПКИ И КНОПКИ DISCORD --- */
 
 /* Контейнер шапки (лого слева, дискорд справа) */
+/* Обновленная шапка */
 .top-header {
     display: flex;
-    justify-content: space-between; 
-    align-items: center;
+    flex-direction: row; /* Выстраиваем в ряд */
+    justify-content: space-between; /* Распределяем по краям */
+    align-items: center; /* Центрируем по вертикали */
     padding: 15px 30px;
-    background: #0f172a; /* Темный фон шапки */
-    border-bottom: 1px solid #1e293b;
+    width: 100%;
+    box-sizing: border-box; /* Чтобы паддинги не раздували ширину */
 }
 
-/* Группировка логотипа и текста под ним */
+/* Группировка лого и текста слева */
 .header-left-group {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; 
+    align-items: flex-start; /* Прижимаем к левому краю */
+    text-align: left;
 }
 
-/* Настройка текста предупреждения */
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0;
+    padding: 0;
+    line-height: 1.1;
+}
+
 .mobile-warning {
-    font-family: 'Inter', sans-serif;
     font-size: 11px;
     color: #64748b;
     margin-top: 4px;
     font-weight: 400;
+    opacity: 0.8;
 }
 
-/* Сама кнопка-ссылка Discord */
+/* Кнопка Discord */
 .discord-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
-    height: 42px;
-    background: #5865F2; /* Фирменный цвет Discord */
+    width: 40px;
+    height: 40px;
+    background: #5865F2;
     border-radius: 10px;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
-    text-decoration: none;
+    transition: transform 0.2s;
+    flex-shrink: 0; /* Чтобы кнопка не сжималась */
 }
 
-/* Настройка иконки внутри кнопки */
 .discord-link img {
-    width: 24px;
-    height: 24px;
-    /* Если иконка discord.svg черная, эта строка сделает её белой: */
-    filter: brightness(0) invert(1); 
-}
-
-/* Эффект при наведении на кнопку */
-.discord-link:hover {
-    transform: translateY(-3px);
-    background: #4752c4;
-    box-shadow: 0 6px 20px rgba(88, 101, 242, 0.5);
-}
-
-/* Эффект при нажатии */
-.discord-link:active {
-    transform: translateY(0);
+    width: 22px;
+    height: 22px;
+    display: block;
 }
