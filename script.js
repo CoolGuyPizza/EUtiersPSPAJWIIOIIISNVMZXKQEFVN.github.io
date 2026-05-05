@@ -11,77 +11,36 @@ const modeIcons = {
 const pointsMapping = { 'HT1': 60, 'LT1': 45, 'HT2': 30, 'LT2': 20, 'HT3': 10, 'LT3': 6, 'HT4': 4, 'LT4': 3, 'HT5': 5, 'LT5': 1, 'NONE': 0 };
 const tierOrder = { 'HT1': 1, 'LT1': 2, 'HT2': 3, 'LT2': 4, 'HT3': 5, 'LT3': 6, 'HT4': 7, 'LT4': 8, 'HT5': 9, 'LT5': 10, 'NONE': 11 };
 
-// --- FIREBASE INITIALIZATION ---
-function startFirebase() {
-    if (typeof firebase !== 'undefined') {
-        const config = {
-            apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
-            authDomain: "://firebaseapp.com",
-            databaseURL: "https://firebaseio.com",
-            projectId: "eutiers",
-            storageBucket: "eutiers.firebasestorage.app",
-            messagingSenderId: "702553921523",
-            appId: "1:702553921523:web:49f526b38bfbe62f776486"
-        };
-        if (!firebase.apps.length) firebase.initializeApp(config);
-        window.db = firebase.database();
-        console.log("🔥 Firebase Connected!");
-
-        window.db.ref('players').on('value', (snapshot) => {
-            const data = snapshot.val();
-            players = data ? Object.values(data) : [];
-            renderTable();
-        });
-    } else {
-        console.log("🔄 Waiting for Firebase SDK...");
-        setTimeout(startFirebase, 500);
-    }
+// --- ПОДКЛЮЧЕНИЕ К БАЗЕ ---
+if (window.db) {
+    window.db.ref('players').on('value', (snapshot) => {
+        const data = snapshot.val();
+        players = data ? Object.values(data) : [];
+        renderTable();
+    });
 }
-startFirebase();
 
-// --- UI GENERATION ---
+// --- НАВИГАЦИЯ ---
 const navCont = document.getElementById('modesNav');
 if (navCont) {
-    let html = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
+    let h = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
     modesList.forEach(m => {
         const label = m === 'netherop' ? 'NethOP' : m.charAt(0).toUpperCase() + m.slice(1);
-        html += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
+        h += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
     });
-    navCont.innerHTML = html;
+    navCont.innerHTML = h;
 }
 
-const modeSelect = document.getElementById('mode-select');
-if (modeSelect) {
+const mSel = document.getElementById('mode-select');
+if (mSel) {
     modesList.forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m; opt.textContent = m.toUpperCase();
-        modeSelect.appendChild(opt);
+        const o = document.createElement('option');
+        o.value = m; o.textContent = m.toUpperCase();
+        mSel.appendChild(o);
     });
 }
 
-// --- ADMIN ---
-document.addEventListener('keydown', (e) => {
-    if (e.code === 'Backquote') {
-        if (!isAdmin) {
-            const m = document.getElementById('loginModal');
-            m.style.display = 'flex'; setTimeout(() => m.classList.add('active'), 10);
-        } else {
-            const p = document.getElementById('adminPanel');
-            p.style.display = (p.style.display === 'none') ? 'block' : 'none';
-        }
-    }
-});
-
-function tryLogin() {
-    const u = document.getElementById('adminUser').value;
-    const p = document.getElementById('adminPass').value;
-    if (u === 'legendgaymer92' && p === 'skibididemon999') {
-        isAdmin = true; sessionStorage.setItem('isAdminAuth', 'true');
-        closeLoginDirect();
-        document.getElementById('adminPanel').style.display = 'block';
-    } else { alert('Incorrect!'); }
-}
-
+// --- ФУНКЦИИ ---
 function savePlayer(e) {
     e.preventDefault();
     if (!isAdmin || !window.db) return;
@@ -96,33 +55,14 @@ function savePlayer(e) {
     p.tiers[document.getElementById('mode-select').value] = document.getElementById('tier-select').value;
     p.region = document.getElementById('region-select').value;
 
-    window.db.ref('players/' + nick.toLowerCase()).set(p).then(() => {
-        document.getElementById('nickname').value = '';
-    });
+    window.db.ref('players/' + nick.toLowerCase()).set(p);
+    document.getElementById('nickname').value = '';
 }
 
 function deletePlayerFromAdmin() {
     if (!isAdmin || !window.db) return;
     const nick = document.getElementById('nickname').value.trim();
     if (nick) window.db.ref('players/' + nick.toLowerCase()).remove();
-}
-
-function logoutAdmin() {
-    isAdmin = false; sessionStorage.removeItem('isAdminAuth');
-    document.getElementById('adminPanel').style.display = 'none';
-}
-
-// --- CORE ---
-function calculatePlayerPoints(p) {
-    let total = 0;
-    modesList.forEach(m => total += pointsMapping[p.tiers[m]] || 0);
-    return total;
-}
-
-function getRankTitle(pts) {
-    if (pts >= 400) return 'Combat Grandmaster';
-    if (pts >= 250) return 'Combat Master';
-    return 'Rookie';
 }
 
 function renderTable() {
@@ -150,11 +90,21 @@ function renderTable() {
     });
 }
 
+function calculatePlayerPoints(p) {
+    let t = 0;
+    modesList.forEach(m => t += pointsMapping[p.tiers[m]] || 0);
+    return t;
+}
+
+function getRankTitle(pts) {
+    if (pts >= 400) return 'Combat Grandmaster';
+    if (pts >= 250) return 'Combat Master';
+    return 'Rookie';
+}
+
 function switchMode(mode) {
     currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
-    if (event) event.currentTarget.classList.add('active');
-    document.getElementById('tier-header-title').textContent = (mode === 'overall') ? 'ALL TIERS' : 'TIER';
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes(mode)));
     renderTable();
 }
 
@@ -197,6 +147,21 @@ function drawSkinToCanvas(imgSource, container) {
     img.onerror = () => { if (imgSource !== 'steve.png') drawSkinToCanvas('steve.png', container); };
 }
 
+function tryLogin() {
+    const u = document.getElementById('adminUser').value;
+    const p = document.getElementById('adminPass').value;
+    if (u === 'legendgaymer92' && p === 'skibididemon999') {
+        isAdmin = true; sessionStorage.setItem('isAdminAuth', 'true');
+        closeLoginDirect();
+        document.getElementById('adminPanel').style.display = 'block';
+    } else { alert('Wrong Credentials!'); }
+}
+
+function logoutAdmin() {
+    isAdmin = false; sessionStorage.removeItem('isAdminAuth');
+    document.getElementById('adminPanel').style.display = 'none';
+}
+
 function closeLoginDirect() {
     const m = document.getElementById('loginModal');
     m.classList.remove('active'); setTimeout(() => m.style.display = 'none', 200);
@@ -206,5 +171,17 @@ function closeModalDirect() {
     const m = document.getElementById('profileModal');
     m.classList.remove('active'); setTimeout(() => m.style.display = 'none', 200);
 }
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Backquote') {
+        if (!isAdmin) {
+            const m = document.getElementById('loginModal');
+            m.style.display = 'flex'; setTimeout(() => m.classList.add('active'), 10);
+        } else {
+            const p = document.getElementById('adminPanel');
+            p.style.display = (p.style.display === 'none') ? 'block' : 'none';
+        }
+    }
+});
 
 document.getElementById('searchBar').addEventListener('input', renderTable);
