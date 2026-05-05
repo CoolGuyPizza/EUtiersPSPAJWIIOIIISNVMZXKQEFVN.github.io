@@ -613,3 +613,23 @@ td:last-child { border-radius: 0 10px 10px 0; }
     background: rgba(255,255,255,0.05);
     margin: 20px 0;
 }
+/* Состояние таблицы во время анимации */
+.fade-in-up {
+    animation: fadeInUp 0.4s ease forwards;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px); /* Смещение вниз на 10 пикселей */
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Сглаживание переходов для всех элементов таблицы */
+#leaderboardBody tr {
+    transition: background-color 0.2s ease;
+}
