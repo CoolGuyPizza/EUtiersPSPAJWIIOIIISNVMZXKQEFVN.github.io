@@ -1,6 +1,5 @@
 let players = JSON.parse(localStorage.getItem('mcTiersData')) || [];
 let currentMode = 'overall';
-// Флаг авторизации админа (сохраняется на время сессии вкладки)
 let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
 
 const modesList = ['vanilla', 'uhc', 'pot', 'netherop', 'smp', 'sword', 'axe', 'mace'];
@@ -32,7 +31,6 @@ if (modeSelect) {
     });
 }
 
-// ПРОВЕРКА ФИЗИЧЕСКОЙ КЛАВИШИ (ДЛЯ АДМИНКИ)
 document.addEventListener('keydown', function(e) {
     if (e.code === 'Backquote') {
         const panel = document.getElementById('adminPanel');
