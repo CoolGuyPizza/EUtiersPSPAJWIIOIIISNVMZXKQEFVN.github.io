@@ -1,7 +1,7 @@
-// --- КОНФИГУРАЦИЯ GITHUB (ЗАПОЛНИ СВОИМИ ДАННЫМИ) ---
-const GH_TOKEN = "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";
+// --- 1. ТВОИ ДАННЫЕ (УЖЕ ЗАПОЛНЕНЫ ТОБОЙ) ---
+const GH_TOKEN = "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"; 
 const GH_OWNER = "CoolGuyPizza";
-const GH_REPO = "EUtiersPSPAJWIIOIIISNVMZXKQEFVN.github.io";
+const GH_REPO = "EUTIERSPSPAJWIIOIIISNVMZXKQEFVN.github.io";
 const GH_PATH = "players.json";
 
 let players = [];
@@ -17,63 +17,74 @@ const modeIcons = {
 const pointsMapping = { 'HT1': 60, 'LT1': 45, 'HT2': 30, 'LT2': 20, 'HT3': 10, 'LT3': 6, 'HT4': 4, 'LT4': 3, 'HT5': 5, 'LT5': 1, 'NONE': 0 };
 const tierOrder = { 'HT1': 1, 'LT1': 2, 'HT2': 3, 'LT2': 4, 'HT3': 5, 'LT3': 6, 'HT4': 7, 'LT4': 8, 'HT5': 9, 'LT5': 10, 'NONE': 11 };
 
-// --- 1. ЗАГРУЗКА ДАННЫХ С GITHUB ---
+// --- 2. ЗАГРУЗКА И СИНХРОНИЗАЦИЯ С GITHUB ---
+
+// Загрузка данных при старте
 async function loadData() {
     try {
-        const response = await fetch(`https://githubusercontent.com{GH_OWNER}/${GH_REPO}/main/${GH_PATH}?v=${new Date().getTime()}`);
+        // Используем обратные кавычки `` для правильной подстановки переменных
+        const url = `https://githubusercontent.com{GH_OWNER}/${GH_REPO}/main/${GH_PATH}?v=${new Date().getTime()}`;
+        const response = await fetch(url);
         if (response.ok) {
             players = await response.json();
-            console.log("✅ Данные загружены из GitHub");
+            console.log("✅ Данные загружены:", players);
             renderTable();
+        } else {
+            console.error("❌ Файл players.json не найден или пуст.");
         }
     } catch (e) {
-        console.error("Ошибка загрузки:", e);
+        console.error("❌ Ошибка сети при загрузке:", e);
     }
 }
 
-// --- 2. СОХРАНЕНИЕ ДАННЫХ В GITHUB ---
+// Сохранение в GitHub
 async function syncToGitHub() {
     try {
-        // Сначала получаем SHA файла (нужно для GitHub API)
-        const fileInfo = await fetch(`https://github.com{GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`, {
+        // Получаем текущую версию файла (SHA), чтобы GitHub разрешил обновление
+        const getUrl = `https://github.com{GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`;
+        const res = await fetch(getUrl, {
             headers: { "Authorization": `token ${GH_TOKEN}` }
-        }).then(res => res.json());
+        });
+        const fileInfo = await res.json();
 
+        // Кодируем данные в Base64 (требование GitHub API)
         const content = btoa(unescape(encodeURIComponent(JSON.stringify(players, null, 2))));
 
-        const response = await fetch(`https://github.com{GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`, {
+        const putResponse = await fetch(getUrl, {
             method: "PUT",
             headers: {
                 "Authorization": `token ${GH_TOKEN}`,
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({
-                message: "Update players database",
+                message: "Update leaderboard",
                 content: content,
                 sha: fileInfo.sha
             })
         });
 
-        if (response.ok) {
-            alert("✅ База обновлена в GitHub!");
+        if (putResponse.ok) {
+            console.log("✅ GitHub обновлен успешно!");
         } else {
-            alert("❌ Ошибка записи. Проверь токен.");
+            const errData = await putResponse.json();
+            alert("Ошибка сохранения: " + errData.message);
         }
     } catch (e) {
-        console.error(e);
+        console.error("❌ Критическая ошибка синхронизации:", e);
     }
 }
 
-// --- 3. ИНИЦИАЛИЗАЦИЯ UI ---
+// --- 3. ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ---
+
 function initUI() {
     const nav = document.getElementById('modesNav');
     if (nav) {
-        let h = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
+        let html = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
         modesList.forEach(m => {
             const label = m === 'netherop' ? 'NethOP' : m.charAt(0).toUpperCase() + m.slice(1);
-            h += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
+            html += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
         });
-        nav.innerHTML = h;
+        nav.innerHTML = html;
     }
     const sel = document.getElementById('mode-select');
     if (sel) {
@@ -83,36 +94,61 @@ function initUI() {
             sel.appendChild(o);
         });
     }
-    loadData();
+    loadData(); // Загружаем данные сразу после создания UI
 }
 
-// --- 4. CANVAS ОТРИСОВКА (ПОЛНАЯ) ---
-function drawSkinToCanvas(imgSource, container) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 16; canvas.height = 32;
-    canvas.style.width = '100px'; canvas.style.height = '180px';
-    canvas.style.imageRendering = 'pixelated';
-    canvas.className = 'modal-skin';
-    const ctx = canvas.getContext('2d');
-    const img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = imgSource;
-    img.onload = () => {
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8); // Head
-        ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8); // Overlay
-        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12); // Body
-        ctx.drawImage(img, 20, 36, 8, 12, 4, 8, 8, 12); // Overlay
-        ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12); // L Arm
-        if (img.height > 32) ctx.drawImage(img, 36, 52, 4, 12, 12, 8, 4, 12); // R Arm
-        ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12); // L Leg
-        if (img.height > 32) ctx.drawImage(img, 20, 52, 4, 12, 8, 20, 4, 12); // R Leg
-        container.appendChild(canvas);
-    };
-    img.onerror = () => { if (imgSource !== 'steve.png') drawSkinToCanvas('steve.png', container); };
+// --- 4. ОСНОВНЫЕ ФУНКЦИИ ---
+
+function renderTable() {
+    const tbody = document.getElementById('leaderboardBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+    const searchVal = document.getElementById('searchBar').value.toLowerCase();
+    let display = players.filter(p => p.nick.toLowerCase().includes(searchVal));
+
+    if (currentMode === 'overall') {
+        display.sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
+    } else {
+        display = display.filter(p => p.tiers && p.tiers[currentMode] !== 'NONE');
+        display.sort((a,b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]);
+    }
+
+    display.forEach((p, i) => {
+        const tr = document.createElement('tr');
+        const pts = calculatePlayerPoints(p);
+        const lower = p.nick.toLowerCase();
+        let tHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => (p.tiers && p.tiers[m] !== 'NONE') ? `<span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${p.tiers[currentMode]}">${p.tiers[currentMode]}</span>`;
+        tr.innerHTML = `<td>${i+1}</td><td><div class="player-cell" onclick="openProfile('${p.nick}')"><div class="css-head" style="background-image: url('${lower}.png'), url('steve.png');"></div><div><span class="player-name">${p.nick}</span><span class="player-title" style="color:var(--text-gray); font-size:11px">${getRankTitle(pts)} (${pts} pts)</span></div></div></td><td><span class="region-badge">${p.region || 'EU'}</span></td><td>${tHTML}</td>`;
+        tbody.appendChild(tr);
+    });
 }
 
-// --- 5. ФУНКЦИИ УПРАВЛЕНИЯ ---
+function openProfile(nick) {
+    const p = players.find(x => x.nick === nick);
+    if (!p) return; // Защита от зависания: если игрока нет, ничего не делаем
+
+    const pts = calculatePlayerPoints(p);
+    const sorted = [...players].sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
+
+    document.getElementById('modalNick').textContent = p.nick;
+    document.getElementById('modalRole').textContent = getRankTitle(pts);
+    document.getElementById('modalRank').textContent = (sorted.findIndex(x => x.nick === nick) + 1) + '.';
+    document.getElementById('modalPoints').textContent = `(${pts} points)`;
+    document.getElementById('modalRegion').textContent = p.region || 'EU';
+    
+    const skinC = document.getElementById("skin_container");
+    if (skinC) {
+        skinC.innerHTML = ''; 
+        drawSkinToCanvas(p.nick.toLowerCase() + '.png', skinC);
+    }
+
+    const grid = document.getElementById('modalTiersGrid');
+    grid.innerHTML = '';
+    modesList.forEach(m => { if (p.tiers && p.tiers[m] !== 'NONE') grid.innerHTML += `<div class="modal-tier-item"><img src="${modeIcons[m]}" width="14"><span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span></div>`; });
+
+    document.getElementById('profileModal').style.display = 'flex';
+}
+
 function savePlayer(e) {
     e.preventDefault();
     if (!isAdmin) return;
@@ -129,43 +165,12 @@ function savePlayer(e) {
     p.region = document.getElementById('region-select').value;
 
     renderTable();
-    syncToGitHub(); // Сохраняем в облако
+    syncToGitHub(); // Отправляем изменения в GitHub
     document.getElementById('nickname').value = '';
 }
 
-function deletePlayerFromAdmin() {
-    if (!isAdmin) return;
-    const nick = document.getElementById('nickname').value.trim();
-    players = players.filter(p => p.nick.toLowerCase() !== nick.toLowerCase());
-    renderTable();
-    syncToGitHub();
-}
+// --- 5. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 
-function renderTable() {
-    const tbody = document.getElementById('leaderboardBody');
-    if (!tbody) return; tbody.innerHTML = '';
-    const searchVal = document.getElementById('searchBar').value.toLowerCase();
-    let display = players.filter(p => p.nick.toLowerCase().includes(searchVal));
-
-    if (currentMode === 'overall') {
-        display.sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
-    } else {
-        display = display.filter(p => p.tiers && p.tiers[currentMode] !== 'NONE');
-        display.sort((a,b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]);
-    }
-
-    display.forEach((p, i) => {
-        const tr = document.createElement('tr');
-        const pts = calculatePlayerPoints(p);
-        const lower = p.nick.toLowerCase();
-        let tHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => (p.tiers && p.tiers[m] !== 'NONE') ? `<span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${p.tiers[currentMode]}">${p.tiers[currentMode]}</span>`;
-
-        tr.innerHTML = `<td>${i+1}</td><td><div class="player-cell" onclick="openProfile('${p.nick}')"><div class="css-head" style="background-image: url('${lower}.png'), url('steve.png');"></div><div><span class="player-name">${p.nick}</span><span class="player-title" style="color:var(--text-gray); font-size:11px">${getRankTitle(pts)} (${pts} pts)</span></div></div></td><td><span class="region-badge">${p.region || 'EU'}</span></td><td>${tHTML}</td>`;
-        tbody.appendChild(tr);
-    });
-}
-
-// --- ВСПОМОГАТЕЛЬНОЕ ---
 function calculatePlayerPoints(p) {
     let t = 0; if(!p.tiers) return 0;
     modesList.forEach(m => t += pointsMapping[p.tiers[m]] || 0);
@@ -184,56 +189,22 @@ function switchMode(mode) {
     renderTable();
 }
 
-function openProfile(nick) {
-    // 1. Проверяем, есть ли вообще такие игроки
-    const p = players.find(x => x.nick === nick); 
-    if (!p) {
-        console.error("Игрок не найден в локальном списке");
-        return; 
-    }
-
-    try {
-        const pts = calculatePlayerPoints(p);
-        const sorted = [...players].sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
-
-        // 2. Безопасное заполнение данных
-        if(document.getElementById('modalNick')) document.getElementById('modalNick').textContent = p.nick;
-        if(document.getElementById('modalRole')) document.getElementById('modalRole').textContent = getRankTitle(pts);
-        
-        const rankEl = document.getElementById('modalRank');
-        if(rankEl) rankEl.textContent = (sorted.findIndex(x => x.nick === nick) + 1) + '.';
-        
-        const ptsEl = document.getElementById('modalPoints');
-        if(ptsEl) ptsEl.textContent = `(${pts} points)`;
-
-        // 3. Скины
-        const skinC = document.getElementById("skin_container");
-        if (skinC) {
-            skinC.innerHTML = ''; 
-            drawSkinToCanvas(p.nick.toLowerCase() + '.png', skinC);
-        }
-
-        // 4. Тиры
-        const grid = document.getElementById('modalTiersGrid');
-        if (grid) {
-            grid.innerHTML = '';
-            modesList.forEach(m => { 
-                if (p.tiers && p.tiers[m] && p.tiers[m] !== 'NONE') {
-                    grid.innerHTML += `<div class="modal-tier-item"><img src="${modeIcons[m]}" width="14" style="margin-right:5px"><span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span></div>`; 
-                }
-            });
-        }
-
-        // 5. Показываем модалку
-        const modal = document.getElementById('profileModal');
-        if (modal) {
-            modal.style.display = 'flex';
-            // Добавляем класс для активации анимации, если он есть в CSS
-            setTimeout(() => modal.classList.add('active'), 10);
-        }
-    } catch (err) {
-        console.error("Ошибка при открытии профиля:", err);
-    }
+function drawSkinToCanvas(imgSource, container) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16; canvas.height = 32;
+    canvas.style.width = '100px'; canvas.style.height = '180px';
+    canvas.style.imageRendering = 'pixelated';
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imgSource;
+    img.onload = () => {
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8); // Head
+        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12); // Body
+        container.appendChild(canvas);
+    };
+    img.onerror = () => { if (imgSource !== 'steve.png') drawSkinToCanvas('steve.png', container); };
 }
 
 function tryLogin() {
@@ -241,7 +212,7 @@ function tryLogin() {
         isAdmin = true; sessionStorage.setItem('isAdminAuth', 'true');
         document.getElementById('loginModal').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-    } else alert('Wrong!');
+    } else alert('Wrong password!');
 }
 
 function closeLoginDirect() { document.getElementById('loginModal').style.display = 'none'; }
@@ -254,4 +225,7 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+document.getElementById('searchBar').addEventListener('input', renderTable);
+
+// ЗАПУСК
 initUI();
