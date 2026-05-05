@@ -633,3 +633,9 @@ td:last-child { border-radius: 0 10px 10px 0; }
 #leaderboardBody tr {
     transition: background-color 0.2s ease;
 }
+
+.mode-btn.active {
+    border-bottom: 2px solid #38bdf8; /* Голубая полоска под активной вкладкой */
+    color: #38bdf8;
+    background: rgba(56, 189, 248, 0.1); /* Легкий фон */
+}
