@@ -317,3 +317,30 @@ function drawSkinToCanvas(imgSource, container) {
 
 const sBar = document.getElementById('searchBar');
 if (sBar) sBar.addEventListener('input', renderTable);
+
+function drawHeadToContainer(imgSource, container) {
+    if (!container) return;
+    
+    const canvas = document.createElement('canvas');
+    canvas.width = 8;
+    canvas.height = 8;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imgSource;
+
+    img.onload = function() {
+        ctx.imageSmoothingEnabled = false;
+        // Рисуем лицо (8,8, 8x8)
+        ctx.drawImage(img, 8, 8, 8, 8, 0, 0, 8, 8);
+        // Рисуем шлем (40,8, 8x8) поверх лица
+        ctx.drawImage(img, 40, 8, 8, 8, 0, 0, 8, 8);
+        
+        // Превращаем канвас в картинку и ставим фоном
+        container.style.backgroundImage = `url(${canvas.toDataURL()})`;
+        container.style.backgroundSize = "cover";
+    };
+
+    img.onerror = function() {
+        if (imgSource !== 'steve.png') drawHeadToContainer('steve.png', container);
+    };
+}
