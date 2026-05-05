@@ -16,9 +16,7 @@
         <div class="logo">EUTIERS</div>
     </div>
 
-    <div class="nav-container" id="modesNav">
-        <!-- Генерируется через JS -->
-    </div>
+    <div class="nav-container" id="modesNav"></div>
 
     <div class="container">
         <div class="header-row">
@@ -35,17 +33,15 @@
                     <th style="width: 150px;">TIERS</th>
                 </tr>
             </thead>
-            <tbody id="leaderboardBody">
-                <!-- Генерируется через JS -->
-            </tbody>
+            <tbody id="leaderboardBody"></tbody>
         </table>
     </div>
 
-    <!-- Firebase SDKs (Библиотеки) -->
+    <!-- КРИТИЧЕСКИ ВАЖНЫЙ БЛОК: СНАЧАЛА БИБЛИОТЕКИ -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 
-    <!-- Инициализация базы данных -->
+    <!-- ПОТОМ ИНИЦИАЛИЗАЦИЯ -->
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
@@ -57,11 +53,17 @@
         appId: "1:702553921523:web:49f526b38bfbe62f776486"
       };
       
+      // Инициализируем Firebase
       firebase.initializeApp(firebaseConfig);
-      window.db = firebase.database(); // Делаем db глобальной для script.js
+      // Принудительно делаем базу глобальной
+      window.db = firebase.database();
+      console.log("Firebase initialized successfully!");
     </script>
 
-    <!-- ADMIN LOGIN MODAL -->
+    <!-- И ТОЛЬКО В САМОМ КОНЦЕ ТВОЙ СКРИПТ -->
+    <script src="script.js"></script>
+
+    <!-- ОСТАЛЬНЫЕ МОДАЛКИ (БЕЗ ИЗМЕНЕНИЙ) -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
@@ -78,14 +80,13 @@
         </div>
     </div>
 
-    <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
             <h3>Control Panel</h3>
             <button onclick="logoutAdmin()" class="delete-btn" style="padding: 5px 10px; font-size: 10px;">Logout</button>
         </div>
         <div class="form-group">
-            <label>Minecraft Username:</label>
+            <label>Nickname:</label>
             <input type="text" id="nickname">
         </div>
         <div class="form-group">
@@ -117,7 +118,6 @@
         <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete Player</button>
     </div>
 
-    <!-- PROFILE MODAL -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
@@ -137,7 +137,5 @@
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
     </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
