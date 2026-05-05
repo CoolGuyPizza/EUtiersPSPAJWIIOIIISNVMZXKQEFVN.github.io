@@ -87,75 +87,70 @@ input[type="text"]:focus, input[type="password"]:focus {
 }
 
 /* NAVIGATION */
+/* ОБНОВЛЕННАЯ НАВИГАЦИЯ: Одинаковый размер вкладок */
 .nav-container {
-    display: flex;
-    gap: 12px;
-    justify-content: center;
-    margin-bottom: 24px;
+    display: grid;
+    /* Создаем 9 равных колонок (8 режимов + Overall). 
+       fr распределяет место абсолютно поровну */
+    grid-template-columns: repeat(9, 1fr); 
+    gap: 8px;
+    max-width: 1200px;
+    margin: 0 auto 24px auto;
 }
 
 .mode-btn {
     background: #0b1528;
     border: 1px solid rgba(56, 189, 248, 0.1);
     color: var(--text-gray);
-    padding: 12px 18px;
+    padding: 12px 5px; /* Уменьшил боковые отступы, чтобы влез текст */
     border-radius: 10px;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 10px; /* Немного уменьшил шрифт для вместимости */
     font-weight: 800;
     text-transform: uppercase;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     gap: 6px;
-    transition: all 0.2s ease; /* Добавлено для плавности */
-}
-
-.mode-btn img {
-    width: 22px;
-    height: 22px;
+    transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    width: 100%; /* Занимает всю ширину своей колонки */
+    box-sizing: border-box;
 }
 
 .mode-btn:hover, .mode-btn.active {
     background: #112240;
     color: #fff;
     border-color: #00b4d8;
-    box-shadow: 0 0 15px rgba(0, 180, 216, 0.2);
-    transform: translateY(-3px); /* Подпрыгивание кнопок */
+    box-shadow: 0 5px 15px rgba(0, 180, 216, 0.2);
+    transform: translateY(-4px); /* Подпрыгивание */
 }
 
-/* TABLE */
+/* ТАБЛИЦА: Эффект для игроков */
 table {
     width: 100%;
-    border-collapse: collapse;
-    text-align: left;
+    border-collapse: separate; /* Изменено с collapse для отступов */
+    border-spacing: 0 4px;    /* Маленький отступ между строками */
 }
 
-th {
-    color: var(--text-gray);
-    font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 12px;
-    border-bottom: 2px solid var(--border-color);
-}
-
-/* ЭФФЕКТ ПОДПРЫГИВАНИЯ ИГРОКА */
 tr {
-    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1); /* Пружинистый эффект */
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-tr:hover {
-    transform: translateY(-4px); /* Подпрыгивание строки */
-    background: rgba(56, 189, 248, 0.02); /* Легкий подсвет фона */
+tbody tr:hover {
+    transform: translateY(-3px) scale(1.005);
+    background: rgba(56, 189, 248, 0.03);
 }
 
+/* Фикс для границ при использовании border-separate */
 td {
     padding: 16px 12px;
+    border-top: 1px solid rgba(56, 189, 248, 0.05);
     border-bottom: 1px solid rgba(56, 189, 248, 0.05);
-    font-size: 14px;
-    vertical-align: middle;
 }
+
+td:first-child { border-left: 1px solid rgba(56, 189, 248, 0.05); border-radius: 8px 0 0 8px; }
+td:last-child { border-right: 1px solid rgba(56, 189, 248, 0.05); border-radius: 0 8px 8px 0; }
 
 .rank-num {
     font-weight: 900;
