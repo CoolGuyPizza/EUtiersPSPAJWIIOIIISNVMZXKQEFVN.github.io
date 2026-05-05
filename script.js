@@ -122,3 +122,39 @@ function savePlayer(e) {
 
 // Логика модалок и отрисовка скина (твои предыдущие функции) остаются без изменений
 // (Просто добавь сюда свои openProfile, drawSkinToCanvas и обработчики логина из прошлого кода)
+
+function switchMode(mode) {
+    const tbody = document.getElementById('leaderboardBody');
+    currentMode = mode;
+    
+    // Обновляем активную кнопку в навигации
+    const navCont = document.getElementById('modesNav');
+    if (navCont) {
+        navCont.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    }
+    if (event && event.currentTarget) {
+        event.currentTarget.classList.add('active');
+    }
+    
+    // Обновляем заголовок
+    const headerTitle = document.getElementById('tier-header-title');
+    if (headerTitle) {
+        headerTitle.textContent = (mode === 'overall') ? 'ALL TIERS' : mode.toUpperCase();
+    }
+
+    if (tbody) {
+        // Убираем анимацию, если она была
+        tbody.classList.remove('fade-in-up');
+        
+        // Перерисовываем таблицу
+        renderTable();
+        
+        // Маленький хак для перезапуска анимации браузером
+        void tbody.offsetWidth; 
+        
+        // Добавляем анимацию снова
+        tbody.classList.add('fade-in-up');
+    } else {
+        renderTable();
+    }
+}
