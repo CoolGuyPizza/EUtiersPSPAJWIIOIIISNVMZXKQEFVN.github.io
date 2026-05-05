@@ -5,38 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EUTIERS</title>
     <meta name="robots" content="noindex, nofollow">
-    
-    <!-- Шрифты -->
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
     <link href="https://googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-    
-    <!-- Подключаем стили -->
     <link rel="stylesheet" href="style.css">
 
-    <!-- 1. ПОДКЛЮЧАЕМ FIREBASE SDK (Версия 8.10.1 самая стабильная для этого метода) -->
+    <!-- Библиотеки Firebase -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
 </head>
 <body>
 
-    <!-- ВЕРХНЯЯ ПАНЕЛЬ С ЛОГОТИПОМ -->
     <div class="top-header">
         <div class="logo">EUTIERS</div>
     </div>
 
-    <!-- NAVIGATION (MODES) -->
-    <div class="nav-container" id="modesNav">
-        <!-- Кнопки режимов генерируются скриптом автоматически -->
-    </div>
+    <div class="nav-container" id="modesNav"></div>
 
-    <!-- MAIN CONTENT -->
     <div class="container">
         <div class="header-row">
             <h1 id="tier-header-title">ALL TIERS</h1>
             <input type="text" id="searchBar" placeholder="Search player...">
         </div>
-
         <table>
             <thead>
                 <tr>
@@ -46,38 +36,30 @@
                     <th style="width: 150px;">TIERS</th>
                 </tr>
             </thead>
-            <tbody id="leaderboardBody">
-                <!-- Строки игроков появятся здесь из базы данных -->
-            </tbody>
+            <tbody id="leaderboardBody"></tbody>
         </table>
     </div>
 
-    <!-- LOGIN MODAL ДЛЯ АДМИНКИ -->
+    <!-- ТВОЙ СКРИПТ -->
+    <script src="script.js"></script>
+
+    <!-- ADMIN LOGIN -->
     <div class="modal-overlay" id="loginModal">
         <div class="modal-card">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
-            <div class="modal-section-title" style="text-align: center; margin-top: 10px;">ADMIN LOGIN</div>
-            <div class="form-group">
-                <label>Username:</label>
-                <input type="text" id="adminUser" placeholder="Enter username">
-            </div>
-            <div class="form-group">
-                <label>Password:</label>
-                <input type="password" id="adminPass" placeholder="Enter password">
-            </div>
+            <div class="modal-section-title" style="text-align: center;">ADMIN LOGIN</div>
+            <div class="form-group"><label>Username:</label><input type="text" id="adminUser"></div>
+            <div class="form-group"><label>Password:</label><input type="password" id="adminPass"></div>
             <button class="admin-btn" onclick="tryLogin()">Login</button>
         </div>
     </div>
 
     <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="margin: 0;">Control Panel</h3>
-            <button onclick="logoutAdmin()" style="background: none; border: none; color: #da3633; cursor: pointer; font-weight: 800; font-size: 12px; text-transform: uppercase;">Logout</button>
-        </div>
+        <h3>Control Panel</h3>
         <div class="form-group">
-            <label>Minecraft Username:</label>
-            <input type="text" id="nickname" placeholder="Player nick">
+            <label>Nickname:</label>
+            <input type="text" id="nickname">
         </div>
         <div class="form-group">
             <label>Region:</label>
@@ -89,25 +71,15 @@
                 <option value="OC">OC</option>
             </select>
         </div>
-        <div class="form-group">
-            <label>Mode:</label>
-            <select id="mode-select">
-                <!-- Наполнится автоматически через script.js -->
-            </select>
-        </div>
+        <div class="form-group"><label>Mode:</label><select id="mode-select"></select></div>
         <div class="form-group">
             <label>Tier:</label>
             <select id="tier-select">
-                <option value="HT1">HT1</option>
-                <option value="LT1">LT1</option>
-                <option value="HT2">HT2</option>
-                <option value="LT2">LT2</option>
-                <option value="HT3">HT3</option>
-                <option value="LT3">LT3</option>
-                <option value="HT4">HT4</option>
-                <option value="LT4">LT4</option>
-                <option value="HT5">HT5</option>
-                <option value="LT5">LT5</option>
+                <option value="HT1">HT1</option><option value="LT1">LT1</option>
+                <option value="HT2">HT2</option><option value="LT2">LT2</option>
+                <option value="HT3">HT3</option><option value="LT3">LT3</option>
+                <option value="HT4">HT4</option><option value="LT4">LT4</option>
+                <option value="HT5">HT5</option><option value="LT5">LT5</option>
                 <option value="NONE">NONE</option>
             </select>
         </div>
@@ -126,18 +98,11 @@
             <div class="modal-section-title">POSITION</div>
             <div class="modal-box">
                 <span class="modal-rank-num" id="modalRank">1.</span>
-                <div class="modal-box-right">
-                    <span class="modal-rank-title">🏆 OVERALL</span>
-                    <span class="modal-points" id="modalPoints">(0 points)</span>
-                </div>
+                <div class="modal-box-right"><span class="modal-rank-title">🏆 OVERALL</span><span class="modal-points" id="modalPoints">(0 points)</span></div>
             </div>
             <div class="modal-section-title">TIERS</div>
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
     </div>
-
-    <!-- 2. ПОДКЛЮЧАЕМ ТВОЙ СКРИПТ (В самом конце после всей верстки) -->
-    <script src="script.js"></script>
-
 </body>
 </html>
