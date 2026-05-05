@@ -1,4 +1,9 @@
-// --- 1. ПЕРЕМЕННЫЕ (Грузим сразу) ---
+// --- КОНФИГУРАЦИЯ GITHUB (ЗАПОЛНИ СВОИМИ ДАННЫМИ) ---
+const GH_TOKEN = "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";
+const GH_OWNER = "CoolGuyPizza";
+const GH_REPO = "EUtiersPSPAJWIIOIIISNVMZXKQEFVN.github.io";
+const GH_PATH = "players.json";
+
 let players = [];
 let currentMode = 'overall';
 let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
@@ -12,59 +17,76 @@ const modeIcons = {
 const pointsMapping = { 'HT1': 60, 'LT1': 45, 'HT2': 30, 'LT2': 20, 'HT3': 10, 'LT3': 6, 'HT4': 4, 'LT4': 3, 'HT5': 5, 'LT5': 1, 'NONE': 0 };
 const tierOrder = { 'HT1': 1, 'LT1': 2, 'HT2': 3, 'LT2': 4, 'HT3': 5, 'LT3': 6, 'HT4': 7, 'LT4': 8, 'HT5': 9, 'LT5': 10, 'NONE': 11 };
 
-// --- 2. ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА (Запуск НЕМЕДЛЕННО) ---
+// --- 1. ЗАГРУЗКА ДАННЫХ С GITHUB ---
+async function loadData() {
+    try {
+        const response = await fetch(`https://githubusercontent.com{GH_OWNER}/${GH_REPO}/main/${GH_PATH}?v=${new Date().getTime()}`);
+        if (response.ok) {
+            players = await response.json();
+            console.log("✅ Данные загружены из GitHub");
+            renderTable();
+        }
+    } catch (e) {
+        console.error("Ошибка загрузки:", e);
+    }
+}
+
+// --- 2. СОХРАНЕНИЕ ДАННЫХ В GITHUB ---
+async function syncToGitHub() {
+    try {
+        // Сначала получаем SHA файла (нужно для GitHub API)
+        const fileInfo = await fetch(`https://github.com{GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`, {
+            headers: { "Authorization": `token ${GH_TOKEN}` }
+        }).then(res => res.json());
+
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(players, null, 2))));
+
+        const response = await fetch(`https://github.com{GH_OWNER}/${GH_REPO}/contents/${GH_PATH}`, {
+            method: "PUT",
+            headers: {
+                "Authorization": `token ${GH_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                message: "Update players database",
+                content: content,
+                sha: fileInfo.sha
+            })
+        });
+
+        if (response.ok) {
+            alert("✅ База обновлена в GitHub!");
+        } else {
+            alert("❌ Ошибка записи. Проверь токен.");
+        }
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+// --- 3. ИНИЦИАЛИЗАЦИЯ UI ---
 function initUI() {
-    const navCont = document.getElementById('modesNav');
-    if (navCont) {
+    const nav = document.getElementById('modesNav');
+    if (nav) {
         let h = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
         modesList.forEach(m => {
             const label = m === 'netherop' ? 'NethOP' : m.charAt(0).toUpperCase() + m.slice(1);
-            h += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}" alt="">${label}</button>`;
+            h += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
         });
-        navCont.innerHTML = h;
+        nav.innerHTML = h;
     }
-    const modeSelect = document.getElementById('mode-select');
-    if (modeSelect) {
-        modeSelect.innerHTML = '';
+    const sel = document.getElementById('mode-select');
+    if (sel) {
         modesList.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m; opt.textContent = m.toUpperCase();
-            modeSelect.appendChild(opt);
+            const o = document.createElement('option');
+            o.value = m; o.textContent = m.toUpperCase();
+            sel.appendChild(o);
         });
     }
+    loadData();
 }
-initUI(); // Рисуем вкладки сразу!
 
-// --- 3. ПОДКЛЮЧЕНИЕ FIREBASE ---
-function startFirebase() {
-    const config = {
-        apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
-        authDomain: "://firebaseapp.com",
-        databaseURL: "https://firebaseio.com",
-        projectId: "eutiers",
-        storageBucket: "eutiers.firebasestorage.app",
-        messagingSenderId: "702553921523",
-        appId: "1:702553921523:web:49f526b38bfbe62f776486"
-    };
-
-    if (typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) firebase.initializeApp(config);
-        window.db = firebase.database();
-        console.log("✅ База подключена!");
-
-        window.db.ref('players').on('value', (snapshot) => {
-            const data = snapshot.val();
-            players = data ? Object.values(data) : [];
-            renderTable();
-        });
-    } else {
-        console.log("🔄 База еще грузится...");
-        setTimeout(startFirebase, 1000);
-    }
-}
-startFirebase();
-
-// --- 4. СКИНЫ (ПОЛНЫЙ КОД CANVAS) ---
+// --- 4. CANVAS ОТРИСОВКА (ПОЛНАЯ) ---
 function drawSkinToCanvas(imgSource, container) {
     const canvas = document.createElement('canvas');
     canvas.width = 16; canvas.height = 32;
@@ -75,33 +97,48 @@ function drawSkinToCanvas(imgSource, container) {
     const img = new Image();
     img.crossOrigin = "anonymous";
     img.src = imgSource;
-    img.onload = function() {
+    img.onload = () => {
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8); // Голова
-        ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8); // Слой 2 головы
-        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12); // Тело
-        ctx.drawImage(img, 20, 36, 8, 12, 4, 8, 8, 12); // Слой 2 тела
-        ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12); // Л. Рука
-        if (img.height > 32) ctx.drawImage(img, 36, 52, 4, 12, 12, 8, 4, 12); // П. Рука
-        ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12); // Л. Нога
-        if (img.height > 32) ctx.drawImage(img, 20, 52, 4, 12, 8, 20, 4, 12); // П. Нога
+        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8); // Head
+        ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8); // Overlay
+        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12); // Body
+        ctx.drawImage(img, 20, 36, 8, 12, 4, 8, 8, 12); // Overlay
+        ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12); // L Arm
+        if (img.height > 32) ctx.drawImage(img, 36, 52, 4, 12, 12, 8, 4, 12); // R Arm
+        ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12); // L Leg
+        if (img.height > 32) ctx.drawImage(img, 20, 52, 4, 12, 8, 20, 4, 12); // R Leg
         container.appendChild(canvas);
     };
     img.onerror = () => { if (imgSource !== 'steve.png') drawSkinToCanvas('steve.png', container); };
 }
 
-// --- 5. ФУНКЦИИ ТАБЛИЦЫ ---
-function calculatePlayerPoints(p) {
-    let t = 0; if (!p.tiers) return 0;
-    modesList.forEach(m => t += pointsMapping[p.tiers[m]] || 0);
-    return t;
+// --- 5. ФУНКЦИИ УПРАВЛЕНИЯ ---
+function savePlayer(e) {
+    e.preventDefault();
+    if (!isAdmin) return;
+    const nick = document.getElementById('nickname').value.trim();
+    if (!nick) return;
+
+    let p = players.find(x => x.nick.toLowerCase() === nick.toLowerCase());
+    if (!p) {
+        p = { nick: nick, region: document.getElementById('region-select').value, tiers: {} };
+        modesList.forEach(m => p.tiers[m] = 'NONE');
+        players.push(p);
+    }
+    p.tiers[document.getElementById('mode-select').value] = document.getElementById('tier-select').value;
+    p.region = document.getElementById('region-select').value;
+
+    renderTable();
+    syncToGitHub(); // Сохраняем в облако
+    document.getElementById('nickname').value = '';
 }
 
-function getRankTitle(pts) {
-    if (pts >= 400) return 'Combat Grandmaster';
-    if (pts >= 250) return 'Combat Master';
-    if (pts >= 100) return 'Combat Ace';
-    return 'Rookie';
+function deletePlayerFromAdmin() {
+    if (!isAdmin) return;
+    const nick = document.getElementById('nickname').value.trim();
+    players = players.filter(p => p.nick.toLowerCase() !== nick.toLowerCase());
+    renderTable();
+    syncToGitHub();
 }
 
 function renderTable() {
@@ -110,11 +147,11 @@ function renderTable() {
     const searchVal = document.getElementById('searchBar').value.toLowerCase();
     let display = players.filter(p => p.nick.toLowerCase().includes(searchVal));
 
-    if (currentMode === 'overall') { 
-        display.sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a)); 
-    } else { 
-        display = display.filter(p => p.tiers && p.tiers[currentMode] !== 'NONE'); 
-        display.sort((a,b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]); 
+    if (currentMode === 'overall') {
+        display.sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
+    } else {
+        display = display.filter(p => p.tiers && p.tiers[currentMode] !== 'NONE');
+        display.sort((a,b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]);
     }
 
     display.forEach((p, i) => {
@@ -122,12 +159,31 @@ function renderTable() {
         const pts = calculatePlayerPoints(p);
         const lower = p.nick.toLowerCase();
         let tHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => (p.tiers && p.tiers[m] !== 'NONE') ? `<span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${p.tiers[currentMode]}">${p.tiers[currentMode]}</span>`;
-        tr.innerHTML = `<td>${i+1}</td><td><div class="player-cell" onclick="openProfile('${p.nick}')"><div class="css-head" style="background-image: url('${lower}.png'), url('steve.png');"></div><div><span class="player-name">${p.nick}</span><span class="player-title">${getRankTitle(pts)} (${pts} pts)</span></div></div></td><td><span class="region-badge">${p.region || 'EU'}</span></td><td>${tHTML}</td>`;
+
+        tr.innerHTML = `<td>${i+1}</td><td><div class="player-cell" onclick="openProfile('${p.nick}')"><div class="css-head" style="background-image: url('${lower}.png'), url('steve.png');"></div><div><span class="player-name">${p.nick}</span><span class="player-title" style="color:var(--text-gray); font-size:11px">${getRankTitle(pts)} (${pts} pts)</span></div></div></td><td><span class="region-badge">${p.region || 'EU'}</span></td><td>${tHTML}</td>`;
         tbody.appendChild(tr);
     });
 }
 
-// --- 6. МОДАЛКИ И АДМИНКА ---
+// --- ВСПОМОГАТЕЛЬНОЕ ---
+function calculatePlayerPoints(p) {
+    let t = 0; if(!p.tiers) return 0;
+    modesList.forEach(m => t += pointsMapping[p.tiers[m]] || 0);
+    return t;
+}
+
+function getRankTitle(pts) {
+    if (pts >= 400) return 'Combat Grandmaster';
+    if (pts >= 250) return 'Combat Master';
+    return 'Rookie';
+}
+
+function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.innerHTML.toLowerCase().includes(mode) || (mode==='overall' && btn.innerHTML.includes('Overall'))));
+    renderTable();
+}
+
 function openProfile(nick) {
     const p = players.find(x => x.nick === nick); if (!p) return;
     const pts = calculatePlayerPoints(p);
@@ -144,37 +200,22 @@ function openProfile(nick) {
     document.getElementById('profileModal').style.display = 'flex';
 }
 
-function savePlayer(e) {
-    e.preventDefault(); if (!isAdmin || !window.db) { alert("Access Denied or Cloud Offline!"); return; }
-    const nick = document.getElementById('nickname').value.trim(); if (!nick) return;
-    let p = players.find(x => x.nick.toLowerCase() === nick.toLowerCase()) || { nick: nick, tiers: {} };
-    p.tiers[document.getElementById('mode-select').value] = document.getElementById('tier-select').value;
-    p.region = document.getElementById('region-select').value;
-    window.db.ref('players/' + nick.toLowerCase()).set(p).then(() => { document.getElementById('nickname').value = ''; });
-}
-
 function tryLogin() {
     if (document.getElementById('adminUser').value === 'legendgaymer92' && document.getElementById('adminPass').value === 'skibididemon999') {
         isAdmin = true; sessionStorage.setItem('isAdminAuth', 'true');
         document.getElementById('loginModal').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-    } else alert('Error!');
-}
-
-function switchMode(mode) {
-    currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.toggle('active', btn.innerHTML.toLowerCase().includes(mode) || (mode==='overall' && btn.innerHTML.includes('Overall'))));
-    renderTable();
-}
-
-function deletePlayerFromAdmin() {
-    if (isAdmin && window.db) {
-        const nick = document.getElementById('nickname').value.trim();
-        if (nick) window.db.ref('players/' + nick.toLowerCase()).remove();
-    }
+    } else alert('Wrong!');
 }
 
 function closeLoginDirect() { document.getElementById('loginModal').style.display = 'none'; }
 function closeModalDirect() { document.getElementById('profileModal').style.display = 'none'; }
-document.addEventListener('keydown', (e) => { if (e.code === 'Backquote') { if (!isAdmin) document.getElementById('loginModal').style.display = 'flex'; else document.getElementById('adminPanel').style.display = document.getElementById('adminPanel').style.display === 'none' ? 'block' : 'none'; } });
-document.getElementById('searchBar').addEventListener('input', renderTable);
+
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Backquote') {
+        if (!isAdmin) document.getElementById('loginModal').style.display = 'flex';
+        else document.getElementById('adminPanel').style.display = document.getElementById('adminPanel').style.display === 'none' ? 'block' : 'none';
+    }
+});
+
+initUI();
