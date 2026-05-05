@@ -1,1 +1,16 @@
-[]
+[
+    {
+        "nick": "LegendGaymer92",
+        "region": "EU",
+        "tiers": {
+            "vanilla": "LT2",
+            "uhc": "NONE",
+            "pot": "NONE",
+            "netherop": "NONE",
+            "smp": "NONE",
+            "sword": "NONE",
+            "axe": "NONE",
+            "mace": "NONE"
+        }
+    }
+]
