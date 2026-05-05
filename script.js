@@ -187,10 +187,10 @@ function renderTable() {
     let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
             
     const lowerNick = player.nick.toLowerCase();
-    const skinUrl = `${lowerNick}.png`;
+const skinUrl = `${lowerNick}.png`;
 
-    // Важно: задаем ОДИНАКОВЫЙ URL дважды (для лица и для шлема)
-    const headStyle = `background-image: url('${skinUrl}'), url('${skinUrl}'), url('steve.png');`;
+// Задаем один и тот же файл для двух слоев + заглушку Стива
+const headStyle = `background-image: url('${skinUrl}'), url('${skinUrl}'), url('steve.png');`;
 
     tr.innerHTML = `
         <td>${index + 1}</td>
