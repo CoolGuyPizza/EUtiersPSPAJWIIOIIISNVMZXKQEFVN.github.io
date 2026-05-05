@@ -506,3 +506,20 @@ td:last-child { border-radius: 0 10px 10px 0; }
     border-top: 1px solid #334155;
     margin: 20px 0 15px 0;
 }
+
+.top-header {
+    display: flex;
+    flex-direction: column; /* Ставим текст под логотип */
+    align-items: center;
+    padding: 20px 0;
+}
+
+.mobile-warning {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #64748b; /* Серый цвет */
+    margin-top: 5px;
+    font-weight: 400;
+    text-transform: none; /* Чтобы не было капсом как лого */
+    opacity: 0.8;
+}
