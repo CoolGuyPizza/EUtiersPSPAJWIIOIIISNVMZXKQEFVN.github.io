@@ -523,3 +523,59 @@ td:last-child { border-radius: 0 10px 10px 0; }
     text-transform: none; /* Чтобы не было капсом как лого */
     opacity: 0.8;
 }
+
+.top-header {
+    display: flex;
+    justify-content: space-between; /* Логотип слева, Дискорд справа */
+    align-items: center;
+    padding: 15px 30px;
+    background: #0f172a; /* Цвет подложки (подправь под свой) */
+    border-bottom: 1px solid #1e293b;
+}
+
+.header-left-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Текст строго под логотипом слева */
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.mobile-warning {
+    font-size: 11px;
+    color: #64748b;
+    margin-top: 4px;
+}
+
+/* Стиль кнопки Дискорда */
+.discord-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: #5865F2; /* Фирменный цвет Discord */
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+}
+
+.discord-link img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1); /* Делает иконку белой, если она черная */
+}
+
+.discord-link:hover {
+    transform: translateY(-3px);
+    background: #4752c4;
+    box-shadow: 0 6px 20px rgba(88, 101, 242, 0.5);
+}
+
+.discord-link:active {
+    transform: translateY(0);
+}
