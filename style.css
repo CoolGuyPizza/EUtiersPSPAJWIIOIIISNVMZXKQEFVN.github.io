@@ -546,33 +546,34 @@ td:last-child { border-radius: 0 10px 10px 0; }
 }
 
 /* Кнопка Discord */
-/* Кнопка Discord */
 .discord-link {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;  /* Чуть увеличим кнопку */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px;
     height: 44px;
-    background: #5865F2;
+    background-color: #5865F2;
     border-radius: 12px;
-    transition: all 0.2s ease;
+    /* Указываем, что именно анимируем: трансформацию и фон */
+    transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out;
     flex-shrink: 0;
+    cursor: pointer;
     text-decoration: none;
-    overflow: hidden; /* Чтобы иконка не вылезала */
-}
-
-/* Сама иконка внутри */
-.discord-link img {
-    width: 26px;  /* Оптимальный размер иконки */
-    height: 26px;
-    object-fit: contain; /* Чтобы иконка не искажалась */
-    display: block;
-    /* Если иконка черная и её не видно на синем, убери комментарий ниже: */
-    /* filter: brightness(0) invert(1); */
 }
 
 /* Эффект наведения */
 .discord-link:hover {
-    background: #4752c4;
-    transform: translateY(-2px);
+    background-color: #4752c4 !important;
+    transform: translateY(-3px) !important; /* Приподнимаем кнопку */
+}
+
+/* Эффект при клике */
+.discord-link:active {
+    transform: translateY(0px) !important;
+}
+
+.discord-link img {
+    width: 26px;
+    height: 26px;
+    pointer-events: none; /* Чтобы клик по картинке не мешал ссылке */
 }
