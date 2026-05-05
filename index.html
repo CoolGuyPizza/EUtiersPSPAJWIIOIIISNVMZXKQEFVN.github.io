@@ -10,9 +10,9 @@
     <link href="https://googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
-    <!-- FIREBASE SDKs (Загружаются ДО script.js) -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
+    <!-- ПОДКЛЮЧЕНИЕ FIREBASE ЧЕРЕЗ САМЫЙ НАДЕЖНЫЙ СЕРВИС -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
 </head>
 <body>
 
@@ -20,13 +20,16 @@
         <div class="logo">EUTIERS</div>
     </div>
 
-    <div class="nav-container" id="modesNav"></div>
+    <div class="nav-container" id="modesNav">
+        <!-- Генерируется через JS -->
+    </div>
 
     <div class="container">
         <div class="header-row">
             <h1 id="tier-header-title">ALL TIERS</h1>
             <input type="text" id="searchBar" placeholder="Search player...">
         </div>
+
         <table>
             <thead>
                 <tr>
@@ -36,7 +39,9 @@
                     <th style="width: 150px;">TIERS</th>
                 </tr>
             </thead>
-            <tbody id="leaderboardBody"></tbody>
+            <tbody id="leaderboardBody">
+                <!-- Генерируется через JS -->
+            </tbody>
         </table>
     </div>
 
@@ -47,7 +52,7 @@
     <div class="modal-overlay" id="loginModal">
         <div class="modal-card">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
-            <div class="modal-section-title" style="text-align: center;">ADMIN LOGIN</div>
+            <div class="modal-section-title" style="text-align: center; margin-top: 10px;">ADMIN LOGIN</div>
             <div class="form-group"><label>Username:</label><input type="text" id="adminUser"></div>
             <div class="form-group"><label>Password:</label><input type="password" id="adminPass"></div>
             <button class="admin-btn" onclick="tryLogin()">Login</button>
@@ -58,14 +63,17 @@
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">Control Panel</h3>
-            <button onclick="logoutAdmin()" class="delete-btn" style="padding: 5px 10px; font-size: 10px;">Logout</button>
+            <button onclick="logoutAdmin()" style="background: none; border: none; color: #da3633; cursor: pointer; font-weight: 800; font-size: 12px; text-transform: uppercase;">Logout</button>
         </div>
-        <div class="form-group"><label>Minecraft Username:</label><input type="text" id="nickname"></div>
+        <div class="form-group"><label>Nickname:</label><input type="text" id="nickname" placeholder="Player nick"></div>
         <div class="form-group">
             <label>Region:</label>
             <select id="region-select">
-                <option value="EU">EU</option><option value="NA">NA</option>
-                <option value="AS">AS</option><option value="AU">AU</option><option value="OC">OC</option>
+                <option value="EU">EU</option>
+                <option value="NA">NA</option>
+                <option value="AS">AS</option>
+                <option value="AU">AU</option>
+                <option value="OC">OC</option>
             </select>
         </div>
         <div class="form-group"><label>Mode:</label><select id="mode-select"></select></div>
