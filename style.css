@@ -507,51 +507,35 @@ td:last-child { border-radius: 0 10px 10px 0; }
     margin: 20px 0 15px 0;
 }
 
+/* --- СТИЛИ ДЛЯ ШАПКИ И КНОПКИ DISCORD --- */
+
+/* Контейнер шапки (лого слева, дискорд справа) */
 .top-header {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start; /* Выравнивание по левому краю */
-    padding: 20px 40px; /* Отступы по бокам, чтобы не липло к краю */
-}
-
-.mobile-warning {
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    color: #64748b; /* Серый цвет */
-    margin-top: 5px;
-    font-weight: 400;
-    text-transform: none; /* Чтобы не было капсом как лого */
-    opacity: 0.8;
-}
-
-.top-header {
-    display: flex;
-    justify-content: space-between; /* Логотип слева, Дискорд справа */
+    justify-content: space-between; 
     align-items: center;
     padding: 15px 30px;
-    background: #0f172a; /* Цвет подложки (подправь под свой) */
+    background: #0f172a; /* Темный фон шапки */
     border-bottom: 1px solid #1e293b;
 }
 
+/* Группировка логотипа и текста под ним */
 .header-left-group {
     display: flex;
     flex-direction: column;
-    align-items: flex-start; /* Текст строго под логотипом слева */
+    align-items: flex-start; 
 }
 
-.logo {
-    font-size: 24px;
-    font-weight: 800;
-    line-height: 1;
-}
-
+/* Настройка текста предупреждения */
 .mobile-warning {
+    font-family: 'Inter', sans-serif;
     font-size: 11px;
     color: #64748b;
     margin-top: 4px;
+    font-weight: 400;
 }
 
-/* Стиль кнопки Дискорда */
+/* Сама кнопка-ссылка Discord */
 .discord-link {
     display: flex;
     align-items: center;
@@ -562,20 +546,25 @@ td:last-child { border-radius: 0 10px 10px 0; }
     border-radius: 10px;
     transition: all 0.3s ease;
     box-shadow: 0 4px 15px rgba(88, 101, 242, 0.3);
+    text-decoration: none;
 }
 
+/* Настройка иконки внутри кнопки */
 .discord-link img {
     width: 24px;
     height: 24px;
-    filter: brightness(0) invert(1); /* Делает иконку белой, если она черная */
+    /* Если иконка discord.svg черная, эта строка сделает её белой: */
+    filter: brightness(0) invert(1); 
 }
 
+/* Эффект при наведении на кнопку */
 .discord-link:hover {
     transform: translateY(-3px);
     background: #4752c4;
     box-shadow: 0 6px 20px rgba(88, 101, 242, 0.5);
 }
 
+/* Эффект при нажатии */
 .discord-link:active {
     transform: translateY(0);
 }
