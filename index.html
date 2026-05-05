@@ -4,82 +4,101 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EUTIERS</title>
+    <!-- Prevent search engines from indexing the site -->
+    <meta name="robots" content="noindex, nofollow">
+    <!-- Connect Inter bold font as in the original -->
+    <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-
-    <!-- ПОДКЛЮЧАЕМ БИБЛИОТЕКИ НАПРЯМУЮ -->
-    <script src="https://gstatic.com"></script>
-    <script src="https://gstatic.com"></script>
-
-    <!-- ИНИЦИАЛИЗИРУЕМ СРАЗУ -->
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
-        authDomain: "://firebaseapp.com",
-        databaseURL: "https://firebaseio.com",
-        projectId: "eutiers",
-        storageBucket: "eutiers.firebasestorage.app",
-        messagingSenderId: "702553921523",
-        appId: "1:702553921523:web:49f526b38bfbe62f776486"
-      };
-      
-      try {
-        firebase.initializeApp(firebaseConfig);
-        window.db = firebase.database();
-        console.log("✅ Firebase Loaded!");
-      } catch (e) {
-        console.error("❌ Firebase Error:", e);
-      }
-    </script>
 </head>
 <body>
 
-    <div class="top-header"><div class="logo">EUTIERS</div></div>
-    <div class="nav-container" id="modesNav"></div>
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ С ЛОГОТИПОМ -->
+    <div class="top-header">
+        <div class="logo">EUTIERS</div>
+    </div>
 
+    <!-- NAVIGATION (MODES) -->
+    <div class="nav-container" id="modesNav">
+        <!-- Mode buttons are generated via JS -->
+    </div>
+
+    <!-- MAIN CONTENT -->
     <div class="container">
         <div class="header-row">
             <h1 id="tier-header-title">ALL TIERS</h1>
             <input type="text" id="searchBar" placeholder="Search player...">
         </div>
+
+        <!-- LEADERBOARD -->
         <table>
             <thead>
-                <tr><th style="width: 50px;">#</th><th>PLAYER</th><th style="width: 100px;">REGION</th><th style="width: 150px;">TIERS</th></tr>
+                <tr>
+                    <th style="width: 50px;">#</th>
+                    <th>PLAYER</th>
+                    <th style="width: 100px;">REGION</th>
+                    <th style="width: 150px;">TIERS</th>
+                </tr>
             </thead>
-            <tbody id="leaderboardBody"></tbody>
+            <tbody id="leaderboardBody" class="fade-in">
+                <!-- Player rows are generated via JS -->
+            </tbody>
         </table>
     </div>
 
-    <!-- ТВОЙ СКРИПТ В САМОМ КОНЦЕ -->
-    <script src="script.js"></script>
-
-    <!-- МОДАЛКИ (БЕЗ ИЗМЕНЕНИЙ) -->
+    <!-- LOGIN MODAL ДЛЯ АДМИНКИ -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
-            <div class="modal-section-title" style="text-align: center;">ADMIN LOGIN</div>
-            <div class="form-group"><label>Username:</label><input type="text" id="adminUser"></div>
-            <div class="form-group"><label>Password:</label><input type="password" id="adminPass"></div>
+            <div class="modal-section-title" style="text-align: center; margin-top: 10px;">ADMIN LOGIN</div>
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" id="adminUser" placeholder="Enter username">
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="adminPass" placeholder="Enter password">
+            </div>
             <button class="admin-btn" onclick="tryLogin()">Login</button>
         </div>
     </div>
 
+    <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
-        <h3>Control Panel</h3>
-        <div class="form-group"><label>Nickname:</label><input type="text" id="nickname"></div>
-        <div class="form-group"><label>Region:</label>
-            <select id="region-select">
-                <option value="EU">EU</option><option value="NA">NA</option>
-                <option value="AS">AS</option><option value="AU">AU</option><option value="OC">OC</option>
-            </select>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="margin: 0;">Control Panel</h3>
+            <button onclick="logoutAdmin()" style="background: none; border: none; color: #da3633; cursor: pointer; font-weight: 800; font-size: 12px; text-transform: uppercase;">Logout</button>
         </div>
-        <div class="form-group"><label>Mode:</label><select id="mode-select"></select></div>
-        <div class="form-group"><label>Tier:</label>
+        <div class="form-group">
+            <label>Minecraft Username:</label>
+            <input type="text" id="nickname" placeholder="Player nick">
+        </div>
+        <div class="form-group">
+            <label>Region:</label>
+            <select id="region-select">
+    <option value="EU">EU</option>
+    <option value="NA">NA</option>
+    <option value="AS">AS</option>
+    <option value="AU">AU</option> <!-- Добавлено -->
+    <option value="OC">OC</option> <!-- Добавлено -->
+</select>
+        </div>
+        <div class="form-group">
+            <label>Mode:</label>
+            <select id="mode-select"></select>
+        </div>
+        <div class="form-group">
+            <label>Tier:</label>
             <select id="tier-select">
-                <option value="HT1">HT1</option><option value="LT1">LT1</option>
-                <option value="HT2">HT2</option><option value="LT2">LT2</option>
-                <option value="HT3">HT3</option><option value="LT3">LT3</option>
-                <option value="HT4">HT4</option><option value="LT4">LT4</option>
-                <option value="HT5">HT5</option><option value="LT5">LT5</option>
+                <option value="HT1">HT1</option>
+                <option value="LT1">LT1</option>
+                <option value="HT2">HT2</option>
+                <option value="LT2">LT2</option>
+                <option value="HT3">HT3</option>
+                <option value="LT3">LT3</option>
+                <option value="HT4">HT4</option>
+                <option value="LT4">LT4</option>
+                <option value="HT5">HT5</option>
+                <option value="LT5">LT5</option>
                 <option value="NONE">NONE</option>
             </select>
         </div>
@@ -87,21 +106,39 @@
         <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete Player</button>
     </div>
 
+    <!-- PROFILE MODAL -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
-            <div class="avatar-container"><div id="skin_container"></div></div>
-            <div class="modal-nick" id="modalNick">Player</div>
-            <div class="role-wrapper"><div class="modal-role" id="modalRole">Rookie</div></div>
-            <div class="modal-region" id="modalRegion">EU</div>
+            
+            <div class="avatar-container">
+                <div id="skin_container"></div>
+            </div>
+
+            <div class="modal-nick" id="modalNick">PlayerName</div>
+            
+            <div class="role-wrapper">
+                <div class="modal-role" id="modalRole">Combat Grandmaster</div>
+            </div>
+            
+            <div class="modal-region" id="modalRegion">Europe</div>
+
             <div class="modal-section-title">POSITION</div>
             <div class="modal-box">
-                <span class="modal-rank-num" id="modalRank">1.</span>
-                <div class="modal-box-right"><span class="modal-rank-title">🏆 OVERALL</span><span class="modal-points" id="modalPoints">(0 points)</span></div>
+                <div class="modal-box-left">
+                    <span class="modal-rank-num" id="modalRank">1.</span>
+                </div>
+                <div class="modal-box-right">
+                    <span class="modal-rank-title">🏆 OVERALL</span>
+                    <span class="modal-points" id="modalPoints">(0 points)</span>
+                </div>
             </div>
+
             <div class="modal-section-title">TIERS</div>
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
     </div>
+
+    <script src="script.js?v=999444"></script>
 </body>
 </html>
