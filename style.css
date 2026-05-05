@@ -186,18 +186,11 @@ td:last-child { border-radius: 0 10px 10px 0; }
     width: 32px;
     height: 32px;
     border-radius: 4px;
-    image-rendering: pixelated;
+    background-color: #1e293b;
+    image-rendering: pixelated; /* Чтобы голова была четкой */
     flex-shrink: 0;
     background-repeat: no-repeat;
-    background-color: #1e293b;
-    border: 1px solid rgba(255,255,255,0.1);
-    
-    /* Принудительно ставим размер 256px (это 32px * 8 частей скина) */
-    background-size: 256px 256px, 256px 256px; 
-    
-    /* Слой 1 (Шлем) и Слой 2 (Лицо) */
-    /* Вырезаем нужные квадраты 32x32px из общего полотна */
-    background-position: -160px -32px, -32px -32px;
+    background-position: center;
 }
 
 .player-cell {
