@@ -1,3 +1,22 @@
+body {
+    /* Создает глубину. Светлое пятно сверху, уходит в темноту вниз */
+    background: radial-gradient(circle at top, #1e293b 0%, #0f172a 100%) !important;
+    background-attachment: fixed !important;
+}
+
+/* Сетка для таблицы и ленты */
+.main-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px; /* Таблица занимает всё место, кроме 300px справа */
+    gap: 30px;
+    align-items: flex-start;
+}
+
+/* На узких экранах (телефонах) лента падает под таблицу */
+@media (max-width: 1100px) {
+    .main-layout { grid-template-columns: 1fr; }
+}
+
 :root {
     --bg-color: #030712;
     --card-bg: #0b1528;
