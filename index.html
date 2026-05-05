@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUTIERS</title>
-    <!-- Запрет индексации поисковиками -->
+    <title>EUTIERS | Leaderboard</title>
     <meta name="robots" content="noindex, nofollow">
-    <!-- Шрифты -->
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -19,140 +17,127 @@
             <div class="mobile-warning">Website may work weird on mobile devices</div>
         </div>
         
-        <!-- КНОПКА DISCORD (замени ссылку на свою) -->
-        <a href="https://discord.gg/ywRZuJ5BTJ" target="_blank" class="discord-link">
+        <a href="https://discord.gg" target="_blank" class="discord-link">
             <img src="icons/discord.svg" alt="Discord">
         </a>
     </div>
 
-    <!-- НАВИГАЦИЯ (РЕЖИМЫ) -->
-    <div class="nav-container" id="modesNav">
-        <!-- Кнопки режимов генерятся через JS -->
-    </div>
+    <!-- НАВИГАЦИЯ -->
+    <div class="nav-container" id="modesNav"></div>
 
     <!-- ОСНОВНОЙ КОНТЕНТ -->
     <div class="container">
-        <div class="header-row">
-            <h1 id="tier-header-title">ALL TIERS</h1>
-            <input type="text" id="searchBar" placeholder="Search player...">
-        </div>
+        <div class="main-layout">
+            
+            <!-- ЛЕВАЯ ЧАСТЬ: ТАБЛИЦА -->
+            <div class="table-section">
+                <div class="header-row">
+                    <h1 id="tier-header-title">ALL TIERS</h1>
+                    <input type="text" id="searchBar" placeholder="Search player...">
+                </div>
 
-        <!-- ТАБЛИЦА ЛИДЕРБОРДА -->
-        <table>
-            <thead>
-                <tr>
-                    <th style="width: 50px;">#</th>
-                    <th>PLAYER</th>
-                    <th style="width: 100px;">REGION</th>
-                    <th style="width: 150px;">TIERS</th>
-                </tr>
-            </thead>
-            <tbody id="leaderboardBody" class="fade-in">
-                <!-- Строки игроков генерятся через JS -->
-            </tbody>
-        </table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">#</th>
+                            <th>PLAYER</th>
+                            <th style="width: 100px;">REGION</th>
+                            <th style="width: 150px;">TIERS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboardBody" class="fade-in"></tbody>
+                </table>
+            </div>
+
+            <!-- ПРАВАЯ ЧАСТЬ: ЛЕНТА АКТИВНОСТИ -->
+            <div class="activity-sidebar">
+                <div class="sidebar-title">Recent Activity</div>
+                <div id="activityFeed">
+                    <!-- Заполняется через JS -->
+                </div>
+                
+                <div class="sidebar-divider"></div>
+                
+                <div class="sidebar-title">Season Info</div>
+                <div class="season-box">
+                    <div class="season-name">Season 1: Origins</div>
+                    <div class="season-status">Ends in: 24 days</div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <!-- МОДАЛЬНОЕ ОКНО ЛОГИНА -->
+    <!-- МОДАЛКИ (Логин, Админка, Профиль) -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
-            <div class="modal-section-title" style="text-align: center; margin-top: 10px;">ADMIN LOGIN</div>
+            <div class="modal-section-title">ADMIN LOGIN</div>
             <div class="form-group">
                 <label>Username:</label>
-                <input type="text" id="adminUser" placeholder="Enter username">
+                <input type="text" id="adminUser">
             </div>
             <div class="form-group">
                 <label>Password:</label>
-                <input type="password" id="adminPass" placeholder="Enter password">
+                <input type="password" id="adminPass">
             </div>
             <button class="admin-btn" onclick="tryLogin()">Login</button>
         </div>
     </div>
 
-    <!-- АДМИН-ПАНЕЛЬ -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">Control Panel</h3>
-            <button onclick="logoutAdmin()" style="background: none; border: none; color: #da3633; cursor: pointer; font-weight: 800; font-size: 12px; text-transform: uppercase;">Logout</button>
+            <button onclick="logoutAdmin()" class="logout-link">Logout</button>
         </div>
-        
         <div class="form-group">
-            <label>Minecraft Username:</label>
-            <input type="text" id="nickname" placeholder="Player nick">
+            <label>Nickname:</label>
+            <input type="text" id="nickname">
         </div>
-        
         <div class="form-group">
             <label>Region:</label>
             <select id="region-select">
-                <option value="EU">EU</option>
-                <option value="NA">NA</option>
-                <option value="AS">AS</option>
-                <option value="AU">AU</option>
+                <option value="EU">EU</option><option value="NA">NA</option>
+                <option value="AS">AS</option><option value="AU">AU</option>
                 <option value="OC">OC</option>
             </select>
         </div>
-        
         <div class="form-group">
             <label>Mode:</label>
             <select id="mode-select"></select>
         </div>
-        
         <div class="form-group">
             <label>Tier:</label>
             <select id="tier-select">
-                <option value="HT1">HT1</option>
-                <option value="LT1">LT1</option>
-                <option value="HT2">HT2</option>
-                <option value="LT2">LT2</option>
-                <option value="HT3">HT3</option>
-                <option value="LT3">LT3</option>
-                <option value="HT4">HT4</option>
-                <option value="LT4">LT4</option>
-                <option value="HT5">HT5</option>
-                <option value="LT5">LT5</option>
+                <option value="HT1">HT1</option><option value="LT1">LT1</option>
+                <option value="HT2">HT2</option><option value="LT2">LT2</option>
+                <option value="HT3">HT3</option><option value="LT3">LT3</option>
+                <option value="HT4">HT4</option><option value="LT4">LT4</option>
+                <option value="HT5">HT5</option><option value="LT5">LT5</option>
                 <option value="NONE">NONE</option>
             </select>
         </div>
-        
         <button class="admin-btn" onclick="savePlayer(event)">Save / Update</button>
-        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()" style="margin-top: 5px;">Delete Player</button>
-        
-        <!-- СЕКЦИЯ СОХРАНЕНИЯ JSON -->
+        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete</button>
         <hr class="admin-divider">
-        <button class="admin-btn download-btn" onclick="downloadJSON()">
-            💾 Download players.json
-        </button>
+        <button class="admin-btn download-btn" onclick="downloadJSON()">💾 Download JSON</button>
     </div>
 
-    <!-- ПРОФИЛЬ ИГРОКА (MODAL) -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
-            
-            <div class="avatar-container">
-                <div id="skin_container"></div>
-            </div>
-
-            <div class="modal-nick" id="modalNick">PlayerName</div>
-            
-            <div class="role-wrapper">
-                <div class="modal-role" id="modalRole">Combat Grandmaster</div>
-            </div>
-            
-            <div class="modal-region" id="modalRegion">Europe</div>
-
+            <div class="avatar-container"><div id="skin_container"></div></div>
+            <div class="modal-nick" id="modalNick"></div>
+            <div class="role-wrapper"><div class="modal-role" id="modalRole"></div></div>
+            <div class="modal-region" id="modalRegion"></div>
             <div class="modal-section-title">POSITION</div>
             <div class="modal-box">
-                <div class="modal-box-left">
-                    <span class="modal-rank-num" id="modalRank">1.</span>
-                </div>
+                <div class="modal-box-left"><span class="modal-rank-num" id="modalRank">1.</span></div>
                 <div class="modal-box-right">
                     <span class="modal-rank-title">🏆 OVERALL</span>
-                    <span class="modal-points" id="modalPoints">(0 points)</span>
+                    <span class="modal-points" id="modalPoints"></span>
                 </div>
             </div>
-
             <div class="modal-section-title">TIERS</div>
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
