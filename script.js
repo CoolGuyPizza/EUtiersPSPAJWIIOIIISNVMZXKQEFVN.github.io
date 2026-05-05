@@ -159,11 +159,34 @@ function downloadJSON() {
 
 // --- ВИЗУАЛИЗАЦИЯ (ТАБЛИЦА И ПРОФИЛЬ) ---
 function switchMode(mode) {
+    const tbody = document.getElementById('leaderboardBody');
     currentMode = mode;
-    document.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
-    if (event) event.currentTarget.classList.add('active');
-    document.getElementById('tier-header-title').textContent = (mode === 'overall') ? 'ALL TIERS' : 'TIER';
-    renderTable();
+    
+    // 1. Убираем активные классы с кнопок (твой старый код)
+    const navCont = document.getElementById('modesNav');
+    if (navCont) navCont.querySelectorAll('.mode-btn').forEach(btn => btn.classList.remove('active'));
+    if (event && event.currentTarget) event.currentTarget.classList.add('active');
+    
+    // 2. Меняем заголовок
+    const headerTitle = document.getElementById('tier-header-title');
+    if (headerTitle) headerTitle.textContent = (mode === 'overall') ? 'ALL TIERS' : mode.toUpperCase();
+
+    // --- ЛОГИКА АНИМАЦИИ ---
+    if (tbody) {
+        // Удаляем класс анимации, чтобы сбросить её
+        tbody.classList.remove('fade-in-up');
+        
+        // Рисуем новые данные (твоя функция)
+        renderTable();
+        
+        // Хак: заставляем браузер "заметить" изменения перед добавлением класса
+        void tbody.offsetWidth; 
+        
+        // Добавляем класс анимации заново
+        tbody.classList.add('fade-in-up');
+    } else {
+        renderTable();
+    }
 }
 
 function renderTable() {
