@@ -245,21 +245,69 @@ function closeModal(e) { if (e.target.className.includes('modal-overlay')) close
 
 function drawSkinToCanvas(imgSource, container) {
     const canvas = document.createElement('canvas');
-    canvas.width = 16; canvas.height = 32;
-    canvas.style.width = '100px'; canvas.style.height = '180px';
+    // Устанавливаем четкие пропорции 1:2
+    canvas.width = 16;
+    canvas.height = 32;
+    canvas.style.width = '120px'; // Можно подправить размер под дизайн
+    canvas.style.height = '240px';
     canvas.style.imageRendering = 'pixelated';
+    canvas.className = 'modal-skin';
     
     const ctx = canvas.getContext('2d');
     const img = new Image();
     img.src = imgSource;
-    img.onload = () => {
+    
+    img.onload = function() {
         ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8); // Head
-        ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8); // Hat
-        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12); // Body
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Очистка перед отрисовкой
+        
+        // --- ГОЛОВА ---
+        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8); // Основа
+        ctx.drawImage(img, 40, 8, 8, 8, 4, 0, 8, 8); // Слой шлема
+        
+        // --- ТЕЛО ---
+        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12); // Основа
+        ctx.drawImage(img, 20, 36, 8, 12, 4, 8, 8, 12); // Слой одежды
+        
+        // --- ПРАВАЯ РУКА ---
+        ctx.drawImage(img, 44, 20, 4, 12, 12, 8, 4, 12);
+        if (img.height === 64) ctx.drawImage(img, 44, 36, 4, 12, 12, 8, 4, 12);
+        
+        // --- ЛЕВАЯ РУКА ---
+        if (img.height === 64) {
+            ctx.drawImage(img, 36, 52, 4, 12, 0, 8, 4, 12);
+            ctx.drawImage(img, 36, 68, 4, 12, 0, 8, 4, 12);
+        } else {
+            // Зеркалим правую для старых скинов
+            ctx.save(); ctx.scale(-1, 1);
+            ctx.drawImage(img, 44, 20, 4, 12, -4, 8, 4, 12);
+            ctx.restore();
+        }
+        
+        // --- ПРАВАЯ НОГА ---
+        ctx.drawImage(img, 4, 20, 4, 12, 8, 20, 4, 12);
+        if (img.height === 64) ctx.drawImage(img, 4, 36, 4, 12, 8, 20, 4, 12);
+        
+        // --- ЛЕВАЯ НОГА ---
+        if (img.height === 64) {
+            ctx.drawImage(img, 20, 52, 4, 12, 4, 20, 4, 12);
+            ctx.drawImage(img, 20, 68, 4, 12, 4, 20, 4, 12);
+        } else {
+            // Зеркалим правую для старых скинов
+            ctx.save(); ctx.scale(-1, 1);
+            ctx.drawImage(img, 4, 20, 4, 12, -8, 20, 4, 12);
+            ctx.restore();
+        }
+        
         container.appendChild(canvas);
     };
-    img.onerror = () => { if (imgSource !== 'steve.png') drawSkinToCanvas('steve.png', container); };
+    
+    img.onerror = function() {
+        if (imgSource !== 'steve.png') {
+            container.innerHTML = '';
+            drawSkinToCanvas('steve.png', container);
+        }
+    };
 }
 
 const sBar = document.getElementById('searchBar');
