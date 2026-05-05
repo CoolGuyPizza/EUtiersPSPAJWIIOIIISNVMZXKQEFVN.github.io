@@ -12,9 +12,10 @@
 </head>
 <body>
 
-    <!-- ВЕРХНЯЯ ПАНЕЛЬ С ЛОГОТИПОМ -->
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ С ЛОГОТИПОМ И ПРЕДУПРЕЖДЕНИЕМ -->
     <div class="top-header">
         <div class="logo">EUTIERS</div>
+        <div class="mobile-warning">Website may work weird on mobile devices</div>
     </div>
 
     <!-- НАВИГАЦИЯ (РЕЖИМЫ) -->
@@ -110,7 +111,7 @@
         <button class="admin-btn" onclick="savePlayer(event)">Save / Update</button>
         <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()" style="margin-top: 5px;">Delete Player</button>
         
-        <!-- КНОПКА СОХРАНЕНИЯ JSON -->
+        <!-- СЕКЦИЯ СОХРАНЕНИЯ JSON -->
         <hr class="admin-divider">
         <button class="admin-btn download-btn" onclick="downloadJSON()">
             💾 Download players.json
