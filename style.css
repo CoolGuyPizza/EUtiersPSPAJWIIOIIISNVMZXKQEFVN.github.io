@@ -185,12 +185,20 @@ td:last-child { border-radius: 0 10px 10px 0; }
 .css-head {
     width: 32px;
     height: 32px;
-    border-radius: 6px;
+    border-radius: 4px;
+    background-size: 800%; /* Увеличиваем скин, чтобы видеть только голову */
+    background-position: 12.5% 12.5%; /* Фокусируемся на области лица (8,8 пикселей) */
+    image-rendering: pixelated; /* Сохраняем пиксельность, чтобы не было мыла */
+    flex-shrink: 0;
     background-repeat: no-repeat;
-    background-size: 256px 128px;
-    background-position: -32px -32px;
-    image-rendering: pixelated;
-    background-color: var(--box-inner-bg);
+    background-color: #1e293b; /* Фон, если картинка не загрузится */
+}
+
+.player-cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
 }
 
 .player-name {
