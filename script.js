@@ -185,19 +185,55 @@ function switchMode(mode) {
 }
 
 function openProfile(nick) {
-    const p = players.find(x => x.nick === nick); if (!p) return;
-    const pts = calculatePlayerPoints(p);
-    const sorted = [...players].sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
-    document.getElementById('modalNick').textContent = p.nick;
-    document.getElementById('modalRole').textContent = getRankTitle(pts);
-    document.getElementById('modalRank').textContent = (sorted.findIndex(x => x.nick === nick) + 1) + '.';
-    document.getElementById('modalPoints').textContent = `(${pts} points)`;
-    document.getElementById('modalRegion').textContent = p.region || 'EU';
-    const skinC = document.getElementById("skin_container");
-    skinC.innerHTML = ''; drawSkinToCanvas(p.nick.toLowerCase() + '.png', skinC);
-    const grid = document.getElementById('modalTiersGrid'); grid.innerHTML = '';
-    modesList.forEach(m => { if (p.tiers && p.tiers[m] !== 'NONE') grid.innerHTML += `<div class="modal-tier-item"><img src="${modeIcons[m]}" width="14"><span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span></div>`; });
-    document.getElementById('profileModal').style.display = 'flex';
+    // 1. Проверяем, есть ли вообще такие игроки
+    const p = players.find(x => x.nick === nick); 
+    if (!p) {
+        console.error("Игрок не найден в локальном списке");
+        return; 
+    }
+
+    try {
+        const pts = calculatePlayerPoints(p);
+        const sorted = [...players].sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
+
+        // 2. Безопасное заполнение данных
+        if(document.getElementById('modalNick')) document.getElementById('modalNick').textContent = p.nick;
+        if(document.getElementById('modalRole')) document.getElementById('modalRole').textContent = getRankTitle(pts);
+        
+        const rankEl = document.getElementById('modalRank');
+        if(rankEl) rankEl.textContent = (sorted.findIndex(x => x.nick === nick) + 1) + '.';
+        
+        const ptsEl = document.getElementById('modalPoints');
+        if(ptsEl) ptsEl.textContent = `(${pts} points)`;
+
+        // 3. Скины
+        const skinC = document.getElementById("skin_container");
+        if (skinC) {
+            skinC.innerHTML = ''; 
+            drawSkinToCanvas(p.nick.toLowerCase() + '.png', skinC);
+        }
+
+        // 4. Тиры
+        const grid = document.getElementById('modalTiersGrid');
+        if (grid) {
+            grid.innerHTML = '';
+            modesList.forEach(m => { 
+                if (p.tiers && p.tiers[m] && p.tiers[m] !== 'NONE') {
+                    grid.innerHTML += `<div class="modal-tier-item"><img src="${modeIcons[m]}" width="14" style="margin-right:5px"><span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span></div>`; 
+                }
+            });
+        }
+
+        // 5. Показываем модалку
+        const modal = document.getElementById('profileModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            // Добавляем класс для активации анимации, если он есть в CSS
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+    } catch (err) {
+        console.error("Ошибка при открытии профиля:", err);
+    }
 }
 
 function tryLogin() {
