@@ -182,33 +182,35 @@ function renderTable() {
     }
 
     displayPlayers.forEach((player, index) => {
-    const tr = document.createElement('tr');
-    const points = calculatePlayerPoints(player);
-    let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
-            
-    const lowerNick = player.nick.toLowerCase();
-const skinUrl = `${lowerNick}.png`;
+        const tr = document.createElement('tr');
+        const points = calculatePlayerPoints(player);
+        const tierCellHTML = currentMode === 'overall' 
+            ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` 
+            : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
+                
+        // Создаем ID для контейнера головы, чтобы потом вставить туда картинку
+        const headId = `head-${player.nick.replace(/\s+/g, '-')}`;
 
-// Задаем один и тот же файл для двух слоев + заглушку Стива
-const headStyle = `background-image: url('${skinUrl}'), url('${skinUrl}'), url('steve.png');`;
-
-    tr.innerHTML = `
-        <td>${index + 1}</td>
-        <td>
-            <div class="player-cell" onclick="openProfile('${player.nick}')">
-                <div class="css-head" style="${headStyle}"></div>
-                <div>
-                    <span class="player-name">${player.nick}</span>
-                    <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
+        tr.innerHTML = `
+            <td>${index + 1}</td>
+            <td>
+                <div class="player-cell" onclick="openProfile('${player.nick}')">
+                    <div class="css-head" id="${headId}"></div>
+                    <div>
+                        <span class="player-name">${player.nick}</span>
+                        <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
+                    </div>
                 </div>
-            </div>
-        </td>
-        <td><span class="region-badge">${player.region || 'NA'}</span></td>
-        <td>${tierCellHTML}</td>
-    `;
-    
-    tbody.appendChild(tr);
-});
+            </td>
+            <td><span class="region-badge">${player.region || 'NA'}</span></td>
+            <td>${tierCellHTML}</td>
+        `;
+        tbody.appendChild(tr);
+
+        // Сразу после добавления строки в таблицу — рисуем голову
+        const headContainer = document.getElementById(headId);
+        drawHeadToContainer(`${player.nick.toLowerCase()}.png`, headContainer);
+    });
 }
 
 function openProfile(nick) {
