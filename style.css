@@ -546,20 +546,33 @@ td:last-child { border-radius: 0 10px 10px 0; }
 }
 
 /* Кнопка Discord */
+/* Кнопка Discord */
 .discord-link {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: 44px;  /* Чуть увеличим кнопку */
+    height: 44px;
     background: #5865F2;
-    border-radius: 10px;
-    transition: transform 0.2s;
-    flex-shrink: 0; /* Чтобы кнопка не сжималась */
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+    text-decoration: none;
+    overflow: hidden; /* Чтобы иконка не вылезала */
 }
 
+/* Сама иконка внутри */
 .discord-link img {
-    width: 22px;
-    height: 22px;
+    width: 26px;  /* Оптимальный размер иконки */
+    height: 26px;
+    object-fit: contain; /* Чтобы иконка не искажалась */
     display: block;
+    /* Если иконка черная и её не видно на синем, убери комментарий ниже: */
+    /* filter: brightness(0) invert(1); */
+}
+
+/* Эффект наведения */
+.discord-link:hover {
+    background: #4752c4;
+    transform: translateY(-2px);
 }
