@@ -462,3 +462,47 @@ td:last-child { border-radius: 0 10px 10px 0; }
 /* --- ANIMATIONS --- */
 .fade-in { opacity: 1; transition: opacity 0.2s ease-in-out; }
 .fade-out { opacity: 0; }
+
+/* Общие стили для кнопок админки, если их еще нет */
+.admin-btn {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+/* Стиль именно для кнопки скачивания */
+.download-btn {
+    background: #10b981; /* Приятный зеленый */
+    color: white;
+    border-bottom: 3px solid #059669; /* Эффект объема */
+}
+
+.download-btn:hover {
+    background: #059669;
+    transform: translateY(-1px);
+}
+
+.download-btn:active {
+    transform: translateY(1px);
+    border-bottom: none;
+    margin-bottom: 3px; /* Чтобы кнопка не прыгала при исчезновении рамки */
+}
+
+/* Разделитель в админке */
+.admin-divider {
+    border: 0;
+    border-top: 1px solid #334155;
+    margin: 20px 0 15px 0;
+}
