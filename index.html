@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EUTIERS</title>
+    <title>EUTIERS - Sandbox</title>
     <meta name="robots" content="noindex, nofollow">
     <link rel="preconnect" href="https://googleapis.com">
     <link rel="preconnect" href="https://gstatic.com" crossorigin>
@@ -16,7 +16,9 @@
         <div class="logo">EUTIERS</div>
     </div>
 
-    <div class="nav-container" id="modesNav"></div>
+    <div class="nav-container" id="modesNav">
+        <!-- Кнопки создаст скрипт -->
+    </div>
 
     <div class="container">
         <div class="header-row">
@@ -33,7 +35,7 @@
                     <th style="width: 150px;">TIERS</th>
                 </tr>
             </thead>
-            <tbody id="leaderboardBody" class="fade-in"></tbody>
+            <tbody id="leaderboardBody"></tbody>
         </table>
     </div>
 
@@ -44,8 +46,8 @@
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
-        authDomain: "eutiers.firebaseapp.com",
-        databaseURL: "https://firebaseio.com", // Ссылка на базу
+        authDomain: "://firebaseapp.com",
+        databaseURL: "https://firebaseio.com",
         projectId: "eutiers",
         storageBucket: "eutiers.firebasestorage.app",
         messagingSenderId: "702553921523",
@@ -55,18 +57,18 @@
       const db = firebase.database();
     </script>
 
-    <!-- ADMIN LOGIN MODAL -->
+    <!-- ADMIN LOGIN -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
-            <div class="modal-section-title" style="text-align: center; margin-top: 10px;">ADMIN LOGIN</div>
+            <div class="modal-section-title" style="text-align: center;">ADMIN LOGIN</div>
             <div class="form-group">
                 <label>Username:</label>
-                <input type="text" id="adminUser" placeholder="Enter username">
+                <input type="text" id="adminUser">
             </div>
             <div class="form-group">
                 <label>Password:</label>
-                <input type="password" id="adminPass" placeholder="Enter password">
+                <input type="password" id="adminPass">
             </div>
             <button class="admin-btn" onclick="tryLogin()">Login</button>
         </div>
@@ -74,13 +76,13 @@
 
     <!-- ADMIN PANEL -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="margin: 0;">Control Panel</h3>
-            <button onclick="logoutAdmin()" style="background: none; border: none; color: #da3633; cursor: pointer; font-weight: 800; font-size: 12px; text-transform: uppercase;">Logout</button>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
+            <h3>Control Panel</h3>
+            <button onclick="logoutAdmin()" class="delete-btn" style="padding: 5px 10px; font-size: 10px;">Logout</button>
         </div>
         <div class="form-group">
-            <label>Minecraft Username:</label>
-            <input type="text" id="nickname" placeholder="Player nick">
+            <label>Nickname:</label>
+            <input type="text" id="nickname">
         </div>
         <div class="form-group">
             <label>Region:</label>
@@ -107,8 +109,8 @@
                 <option value="NONE">NONE</option>
             </select>
         </div>
-        <button class="admin-btn" onclick="savePlayer(event)">Save / Update</button>
-        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete Player</button>
+        <button class="admin-btn" onclick="savePlayer(event)">Save</button>
+        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete</button>
     </div>
 
     <!-- PROFILE MODAL -->
@@ -116,7 +118,7 @@
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
             <div class="avatar-container"><div id="skin_container"></div></div>
-            <div class="modal-nick" id="modalNick">PlayerName</div>
+            <div class="modal-nick" id="modalNick">Player</div>
             <div class="role-wrapper"><div class="modal-role" id="modalRole">Rookie</div></div>
             <div class="modal-region" id="modalRegion">EU</div>
             <div class="modal-section-title">POSITION</div>
