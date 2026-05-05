@@ -1,4 +1,7 @@
-// 1. Сразу объявляем данные, чтобы списки в админке не были пустыми
+let players = [];
+let currentMode = 'overall';
+let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
+
 const modesList = ['vanilla', 'uhc', 'pot', 'netherop', 'smp', 'sword', 'axe', 'mace'];
 const modeIcons = {
     'vanilla': 'icons/vanilla.svg', 'uhc': 'icons/uhc.svg', 'pot': 'icons/pot.svg',
@@ -8,26 +11,21 @@ const modeIcons = {
 const pointsMapping = { 'HT1': 60, 'LT1': 45, 'HT2': 30, 'LT2': 20, 'HT3': 10, 'LT3': 6, 'HT4': 4, 'LT4': 3, 'HT5': 5, 'LT5': 1, 'NONE': 0 };
 const tierOrder = { 'HT1': 1, 'LT1': 2, 'HT2': 3, 'LT2': 4, 'HT3': 5, 'LT3': 6, 'HT4': 7, 'LT4': 8, 'HT5': 9, 'LT5': 10, 'NONE': 11 };
 
-let players = [];
-let currentMode = 'overall';
-let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
-
-// 2. Инициализация Firebase с проверкой
-function initFirebase() {
-    const firebaseConfig = {
-        apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
-        authDomain: "://firebaseapp.com",
-        databaseURL: "https://firebaseio.com",
-        projectId: "eutiers",
-        storageBucket: "eutiers.firebasestorage.app",
-        messagingSenderId: "702553921523",
-        appId: "1:702553921523:web:49f526b38bfbe62f776486"
-    };
-
+// --- ФУНКЦИЯ ЗАПУСКА ---
+function startEverything() {
     if (typeof firebase !== 'undefined') {
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+        const config = {
+            apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
+            authDomain: "://firebaseapp.com",
+            databaseURL: "https://firebaseio.com",
+            projectId: "eutiers",
+            storageBucket: "eutiers.firebasestorage.app",
+            messagingSenderId: "702553921523",
+            appId: "1:702553921523:web:49f526b38bfbe62f776486"
+        };
+        if (!firebase.apps.length) firebase.initializeApp(config);
         window.db = firebase.database();
-        console.log("✅ Firebase Connected");
+        console.log("Firebase Connected!");
 
         window.db.ref('players').on('value', (snapshot) => {
             const data = snapshot.val();
@@ -35,43 +33,37 @@ function initFirebase() {
             renderTable();
         });
     } else {
-        console.log("🔄 Waiting for SDK...");
-        setTimeout(initFirebase, 500);
+        setTimeout(startEverything, 500);
     }
 }
 
-// 3. Наполнение админки и навигации (Запускаем сразу!)
-function setupUI() {
-    const navCont = document.getElementById('modesNav');
-    if (navCont) {
-        let html = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
-        modesList.forEach(m => {
-            const label = m === 'netherop' ? 'NethOP' : m.charAt(0).toUpperCase() + m.slice(1);
-            html += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
-        });
-        navCont.innerHTML = html;
-    }
+// Запускаем
+startEverything();
 
-    const modeSelect = document.getElementById('mode-select');
-    if (modeSelect && modeSelect.options.length === 0) {
-        modesList.forEach(m => {
-            const opt = document.createElement('option');
-            opt.value = m; opt.textContent = m.toUpperCase();
-            modeSelect.appendChild(opt);
-        });
-    }
+// --- ИНИЦИАЛИЗАЦИЯ ИНТЕРФЕЙСА ---
+const nav = document.getElementById('modesNav');
+if (nav) {
+    let h = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
+    modesList.forEach(m => {
+        const label = m === 'netherop' ? 'NethOP' : m.charAt(0).toUpperCase() + m.slice(1);
+        h += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
+    });
+    nav.innerHTML = h;
 }
 
-// Запуск при старте
-setupUI();
-initFirebase();
+const sel = document.getElementById('mode-select');
+if (sel) {
+    modesList.forEach(m => {
+        const o = document.createElement('option');
+        o.value = m; o.textContent = m.toUpperCase();
+        sel.appendChild(o);
+    });
+}
 
-// --- ОСТАЛЬНЫЕ ФУНКЦИИ (Save, Delete, Render и т.д. - оставь как были раньше) ---
-// Убедись, что в savePlayer используется window.db
-
+// --- ФУНКЦИИ ---
 function savePlayer(e) {
-    if (e) e.preventDefault();
-    if (!isAdmin || !window.db) { alert("Ошибка: База не готова или нет прав!"); return; }
+    e.preventDefault();
+    if (!isAdmin || !window.db) return;
     const nick = document.getElementById('nickname').value.trim();
     if (!nick) return;
 
@@ -83,9 +75,14 @@ function savePlayer(e) {
     p.tiers[document.getElementById('mode-select').value] = document.getElementById('tier-select').value;
     p.region = document.getElementById('region-select').value;
 
-    window.db.ref('players/' + nick.toLowerCase()).set(p).then(() => {
-        document.getElementById('nickname').value = '';
-    });
+    window.db.ref('players/' + nick.toLowerCase()).set(p);
+    document.getElementById('nickname').value = '';
+}
+
+function deletePlayerFromAdmin() {
+    if (!isAdmin || !window.db) return;
+    const nick = document.getElementById('nickname').value.trim();
+    if (nick) window.db.ref('players/' + nick.toLowerCase()).remove();
 }
 
 function renderTable() {
@@ -96,9 +93,9 @@ function renderTable() {
     let display = players.filter(p => p.nick.toLowerCase().includes(searchVal));
 
     if (currentMode === 'overall') {
-        display.sort((a,b) => (calculatePlayerPoints(b) || 0) - (calculatePlayerPoints(a) || 0));
+        display.sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
     } else {
-        display = display.filter(p => p.tiers[currentMode] !== 'NONE');
+        display = display.filter(p => p.tiers && p.tiers[currentMode] !== 'NONE');
         display.sort((a,b) => tierOrder[a.tiers[currentMode]] - tierOrder[b.tiers[currentMode]]);
     }
 
@@ -114,8 +111,7 @@ function renderTable() {
 }
 
 function calculatePlayerPoints(p) {
-    let t = 0;
-    if (!p.tiers) return 0;
+    let t = 0; if (!p.tiers) return 0;
     modesList.forEach(m => t += pointsMapping[p.tiers[m]] || 0);
     return t;
 }
@@ -137,23 +133,53 @@ function tryLogin() {
     const p = document.getElementById('adminPass').value;
     if (u === 'legendgaymer92' && p === 'skibididemon999') {
         isAdmin = true; sessionStorage.setItem('isAdminAuth', 'true');
-        closeLoginDirect();
+        document.getElementById('loginModal').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-    } else { alert('Wrong password!'); }
+    } else { alert('Wrong Credentials!'); }
 }
 
-function deletePlayerFromAdmin() {
-    if (!isAdmin || !window.db) return;
-    const nick = document.getElementById('nickname').value.trim();
-    if (nick) window.db.ref('players/' + nick.toLowerCase()).remove();
+function openProfile(nick) {
+    const p = players.find(x => x.nick === nick);
+    if (!p) return;
+    const pts = calculatePlayerPoints(p);
+    document.getElementById('modalNick').textContent = p.nick;
+    document.getElementById('modalRole').textContent = getRankTitle(pts);
+    document.getElementById('modalPoints').textContent = `(${pts} points)`;
+    document.getElementById('modalRegion').textContent = p.region || 'EU';
+    const skinC = document.getElementById("skin_container");
+    skinC.innerHTML = ''; drawSkinToCanvas(p.nick.toLowerCase() + '.png', skinC);
+    
+    const grid = document.getElementById('modalTiersGrid');
+    grid.innerHTML = '';
+    modesList.forEach(m => { if (p.tiers && p.tiers[m] !== 'NONE') grid.innerHTML += `<div class="modal-tier-item"><span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span></div>`; });
+    document.getElementById('profileModal').style.display = 'flex';
+}
+
+function drawSkinToCanvas(imgSource, container) {
+    const canvas = document.createElement('canvas');
+    canvas.width = 16; canvas.height = 32;
+    canvas.style.width = '100px'; canvas.style.height = '180px';
+    canvas.style.imageRendering = 'pixelated';
+    canvas.className = 'modal-skin';
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = imgSource;
+    img.onload = () => {
+        ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8);
+        ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12);
+        container.appendChild(canvas);
+    };
+    img.onerror = () => { if (imgSource !== 'steve.png') drawSkinToCanvas('steve.png', container); };
 }
 
 function closeLoginDirect() { document.getElementById('loginModal').style.display = 'none'; }
-function logoutAdmin() { isAdmin = false; sessionStorage.removeItem('isAdminAuth'); document.getElementById('adminPanel').style.display = 'none'; }
+function closeModalDirect() { document.getElementById('profileModal').style.display = 'none'; }
 
 document.addEventListener('keydown', (e) => {
     if (e.code === 'Backquote') {
-        if (!isAdmin) { document.getElementById('loginModal').style.display = 'flex'; }
-        else { document.getElementById('adminPanel').style.display = document.getElementById('adminPanel').style.display === 'none' ? 'block' : 'none'; }
+        if (!isAdmin) document.getElementById('loginModal').style.display = 'flex';
+        else document.getElementById('adminPanel').style.display = document.getElementById('adminPanel').style.display === 'none' ? 'block' : 'none';
     }
 });
+
+document.getElementById('searchBar').addEventListener('input', renderTable);
