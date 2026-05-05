@@ -4,22 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EUTIERS</title>
-    <meta name="robots" content="noindex, nofollow">
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 
-    <!-- Библиотеки Firebase загружаем в начале -->
+    <!-- ПОДКЛЮЧАЕМ БИБЛИОТЕКИ НАПРЯМУЮ -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
+
+    <!-- ИНИЦИАЛИЗИРУЕМ СРАЗУ -->
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
+        authDomain: "://firebaseapp.com",
+        databaseURL: "https://firebaseio.com",
+        projectId: "eutiers",
+        storageBucket: "eutiers.firebasestorage.app",
+        messagingSenderId: "702553921523",
+        appId: "1:702553921523:web:49f526b38bfbe62f776486"
+      };
+      
+      try {
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.database();
+        console.log("✅ Firebase Loaded!");
+      } catch (e) {
+        console.error("❌ Firebase Error:", e);
+      }
+    </script>
 </head>
 <body>
 
-    <div class="top-header">
-        <div class="logo">EUTIERS</div>
-    </div>
-
+    <div class="top-header"><div class="logo">EUTIERS</div></div>
     <div class="nav-container" id="modesNav"></div>
 
     <div class="container">
@@ -27,21 +41,18 @@
             <h1 id="tier-header-title">ALL TIERS</h1>
             <input type="text" id="searchBar" placeholder="Search player...">
         </div>
-
         <table>
             <thead>
-                <tr>
-                    <th style="width: 50px;">#</th>
-                    <th>PLAYER</th>
-                    <th style="width: 100px;">REGION</th>
-                    <th style="width: 150px;">TIERS</th>
-                </tr>
+                <tr><th style="width: 50px;">#</th><th>PLAYER</th><th style="width: 100px;">REGION</th><th style="width: 150px;">TIERS</th></tr>
             </thead>
-            <tbody id="leaderboardBody" class="fade-in"></tbody>
+            <tbody id="leaderboardBody"></tbody>
         </table>
     </div>
 
-    <!-- Модалки -->
+    <!-- ТВОЙ СКРИПТ В САМОМ КОНЦЕ -->
+    <script src="script.js"></script>
+
+    <!-- МОДАЛКИ (БЕЗ ИЗМЕНЕНИЙ) -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
@@ -92,8 +103,5 @@
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
     </div>
-
-    <!-- Твой основной скрипт -->
-    <script src="script.js"></script>
 </body>
 </html>
