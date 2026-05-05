@@ -182,28 +182,33 @@ function renderTable() {
     }
 
     displayPlayers.forEach((player, index) => {
-        const tr = document.createElement('tr');
-        const points = calculatePlayerPoints(player);
-        const tierCellHTML = currentMode === 'overall' 
-            ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` 
-            : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
-                
-        tr.innerHTML = `
-            <td>${index + 1}</td>
-            <td>
-                <div class="player-cell" onclick="openProfile('${player.nick}')">
-                    <div class="css-head" style="background-image: url('${player.nick.toLowerCase()}.png'), url('steve.png');"></div>
-                    <div>
-                        <span class="player-name">${player.nick}</span>
-                        <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
-                    </div>
+    const tr = document.createElement('tr');
+    const points = calculatePlayerPoints(player);
+    let tierCellHTML = currentMode === 'overall' ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
+            
+    const lowerNick = player.nick.toLowerCase();
+    const skinUrl = `${lowerNick}.png`;
+
+    // Важно: задаем ОДИНАКОВЫЙ URL дважды (для лица и для шлема)
+    const headStyle = `background-image: url('${skinUrl}'), url('${skinUrl}'), url('steve.png');`;
+
+    tr.innerHTML = `
+        <td>${index + 1}</td>
+        <td>
+            <div class="player-cell" onclick="openProfile('${player.nick}')">
+                <div class="css-head" style="${headStyle}"></div>
+                <div>
+                    <span class="player-name">${player.nick}</span>
+                    <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
                 </div>
-            </td>
-            <td><span class="region-badge">${player.region || 'NA'}</span></td>
-            <td>${tierCellHTML}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+            </div>
+        </td>
+        <td><span class="region-badge">${player.region || 'NA'}</span></td>
+        <td>${tierCellHTML}</td>
+    `;
+    
+    tbody.appendChild(tr);
+});
 }
 
 function openProfile(nick) {
