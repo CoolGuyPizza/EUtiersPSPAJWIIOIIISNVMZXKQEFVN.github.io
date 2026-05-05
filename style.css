@@ -1,5 +1,4 @@
 :root {
-    /* Цвета изменены на глубоководные морские оттенки */
     --bg-color: #030712;
     --card-bg: #0b1528;
     --text-color: #ffffff;
@@ -10,7 +9,6 @@
 }
 
 body {
-    /* Фоновый градиент имитирует погружение на глубину */
     background: linear-gradient(to bottom, #0f172a 0%, #030712 100%);
     color: var(--text-color);
     font-family: 'Inter', -apple-system, sans-serif;
@@ -20,7 +18,6 @@ body {
     min-height: 100vh;
 }
 
-/* СТИЛИ ДЛЯ ШАПКИ И БОЛЬШОГО ГРАДИЕНТНОГО ЛОГОТИПА */
 .top-header {
     max-width: 1200px;
     margin: 0 auto 20px auto;
