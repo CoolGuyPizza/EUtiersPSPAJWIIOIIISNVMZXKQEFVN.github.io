@@ -4,24 +4,32 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EUTIERS</title>
+    <!-- Запрет индексации поисковиками -->
     <meta name="robots" content="noindex, nofollow">
+    <!-- Шрифты -->
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
+    <!-- ВЕРХНЯЯ ПАНЕЛЬ С ЛОГОТИПОМ -->
     <div class="top-header">
         <div class="logo">EUTIERS</div>
     </div>
 
-    <div class="nav-container" id="modesNav"></div>
+    <!-- НАВИГАЦИЯ (РЕЖИМЫ) -->
+    <div class="nav-container" id="modesNav">
+        <!-- Кнопки режимов генерятся через JS -->
+    </div>
 
+    <!-- ОСНОВНОЙ КОНТЕНТ -->
     <div class="container">
         <div class="header-row">
             <h1 id="tier-header-title">ALL TIERS</h1>
             <input type="text" id="searchBar" placeholder="Search player...">
         </div>
 
+        <!-- ТАБЛИЦА ЛИДЕРБОРДА -->
         <table>
             <thead>
                 <tr>
@@ -31,11 +39,13 @@
                     <th style="width: 150px;">TIERS</th>
                 </tr>
             </thead>
-            <tbody id="leaderboardBody" class="fade-in"></tbody>
+            <tbody id="leaderboardBody" class="fade-in">
+                <!-- Строки игроков генерятся через JS -->
+            </tbody>
         </table>
     </div>
 
-    <!-- LOGIN MODAL -->
+    <!-- МОДАЛЬНОЕ ОКНО ЛОГИНА -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
@@ -52,16 +62,18 @@
         </div>
     </div>
 
-    <!-- ADMIN PANEL -->
+    <!-- АДМИН-ПАНЕЛЬ -->
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
             <h3 style="margin: 0;">Control Panel</h3>
             <button onclick="logoutAdmin()" style="background: none; border: none; color: #da3633; cursor: pointer; font-weight: 800; font-size: 12px; text-transform: uppercase;">Logout</button>
         </div>
+        
         <div class="form-group">
             <label>Minecraft Username:</label>
             <input type="text" id="nickname" placeholder="Player nick">
         </div>
+        
         <div class="form-group">
             <label>Region:</label>
             <select id="region-select">
@@ -72,10 +84,12 @@
                 <option value="OC">OC</option>
             </select>
         </div>
+        
         <div class="form-group">
             <label>Mode:</label>
             <select id="mode-select"></select>
         </div>
+        
         <div class="form-group">
             <label>Tier:</label>
             <select id="tier-select">
@@ -92,30 +106,45 @@
                 <option value="NONE">NONE</option>
             </select>
         </div>
+        
         <button class="admin-btn" onclick="savePlayer(event)">Save / Update</button>
         <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()" style="margin-top: 5px;">Delete Player</button>
         
-        <!-- НОВАЯ КНОПКА ДЛЯ СОХРАНЕНИЯ ФАЙЛА -->
-        <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;">
-        <button class="admin-btn" onclick="downloadJSON()" style="background: #2ecc71;">Download players.json</button>
+        <!-- КНОПКА СОХРАНЕНИЯ JSON -->
+        <hr class="admin-divider">
+        <button class="admin-btn download-btn" onclick="downloadJSON()">
+            💾 Download players.json
+        </button>
     </div>
 
-    <!-- PROFILE MODAL -->
+    <!-- ПРОФИЛЬ ИГРОКА (MODAL) -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
-            <div class="avatar-container"><div id="skin_container"></div></div>
+            
+            <div class="avatar-container">
+                <div id="skin_container"></div>
+            </div>
+
             <div class="modal-nick" id="modalNick">PlayerName</div>
-            <div class="role-wrapper"><div class="modal-role" id="modalRole">Combat Grandmaster</div></div>
+            
+            <div class="role-wrapper">
+                <div class="modal-role" id="modalRole">Combat Grandmaster</div>
+            </div>
+            
             <div class="modal-region" id="modalRegion">Europe</div>
+
             <div class="modal-section-title">POSITION</div>
             <div class="modal-box">
-                <div class="modal-box-left"><span class="modal-rank-num" id="modalRank">1.</span></div>
+                <div class="modal-box-left">
+                    <span class="modal-rank-num" id="modalRank">1.</span>
+                </div>
                 <div class="modal-box-right">
                     <span class="modal-rank-title">🏆 OVERALL</span>
                     <span class="modal-points" id="modalPoints">(0 points)</span>
                 </div>
             </div>
+
             <div class="modal-section-title">TIERS</div>
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
