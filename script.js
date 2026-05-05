@@ -174,6 +174,7 @@ function renderTable() {
     const searchVal = document.getElementById('searchBar').value.toLowerCase();
     let displayPlayers = players.filter(p => p.nick.toLowerCase().includes(searchVal));
 
+    // Сортировка
     if (currentMode === 'overall') { 
         displayPlayers.sort((a, b) => calculatePlayerPoints(b) - calculatePlayerPoints(a)); 
     } else { 
@@ -188,14 +189,14 @@ function renderTable() {
             ? `<div class="tiers-row">` + modesList.map(m => player.tiers[m] !== 'NONE' ? `<span class="tier-badge ${player.tiers[m]}">${player.tiers[m]}</span>` : '').join('') + `</div>` 
             : `<span class="tier-badge ${player.tiers[currentMode]}">${player.tiers[currentMode]}</span>`;
                 
-        // Создаем ID для контейнера головы, чтобы потом вставить туда картинку
-        const headId = `head-${player.nick.replace(/\s+/g, '-')}`;
+        // Создаем уникальный ID для каждой головы
+        const headId = `head-img-${index}`;
 
         tr.innerHTML = `
             <td>${index + 1}</td>
             <td>
                 <div class="player-cell" onclick="openProfile('${player.nick}')">
-                    <div class="css-head" id="${headId}"></div>
+                    <canvas id="${headId}" width="8" height="8" class="css-head-canvas"></canvas>
                     <div>
                         <span class="player-name">${player.nick}</span>
                         <span class="player-title">${getRankTitle(points)} (${points} pts)</span>
@@ -207,9 +208,9 @@ function renderTable() {
         `;
         tbody.appendChild(tr);
 
-        // Сразу после добавления строки в таблицу — рисуем голову
-        const headContainer = document.getElementById(headId);
-        drawHeadToContainer(`${player.nick.toLowerCase()}.png`, headContainer);
+        // Рисуем голову прямо на канвас внутри ячейки
+        const canvas = document.getElementById(headId);
+        drawHeadOnCanvas(`${player.nick.toLowerCase()}.png`, canvas);
     });
 }
 
@@ -344,5 +345,21 @@ function drawHeadToContainer(imgSource, container) {
 
     img.onerror = function() {
         if (imgSource !== 'steve.png') drawHeadToContainer('steve.png', container);
+    };
+}
+
+function drawHeadOnCanvas(src, canvas) {
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.src = src;
+    img.onload = function() {
+        ctx.imageSmoothingEnabled = false;
+        // Лицо
+        ctx.drawImage(img, 8, 8, 8, 8, 0, 0, 8, 8);
+        // Шлем (второй слой)
+        ctx.drawImage(img, 40, 8, 8, 8, 0, 0, 8, 8);
+    };
+    img.onerror = function() {
+        if (src !== 'steve.png') drawHeadOnCanvas('steve.png', canvas);
     };
 }
