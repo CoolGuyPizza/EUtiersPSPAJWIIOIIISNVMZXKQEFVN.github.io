@@ -1,3 +1,31 @@
+// Ждем полной загрузки страницы и всех библиотек
+window.addEventListener('load', function() {
+    if (typeof firebase !== 'undefined') {
+        const firebaseConfig = {
+            apiKey: "AIzaSyB8ESTmHczPwlj7ZQRFDbM2larnkmiEJXE",
+            authDomain: "://firebaseapp.com",
+            databaseURL: "https://firebaseio.com",
+            projectId: "eutiers",
+            storageBucket: "eutiers.firebasestorage.app",
+            messagingSenderId: "702553921523",
+            appId: "1:702553921523:web:49f526b38bfbe62f776486"
+        };
+        
+        firebase.initializeApp(firebaseConfig);
+        window.db = firebase.database();
+        console.log("Firebase подключен успешно!");
+
+        // Запускаем синхронизацию данных
+        window.db.ref('players').on('value', (snapshot) => {
+            const data = snapshot.val();
+            players = data ? Object.values(data) : [];
+            renderTable();
+        });
+    } else {
+        console.error("Firebase не загрузился. Проверь интернет или ссылки на SDK.");
+    }
+});
+
 let players = [];
 let currentMode = 'overall';
 let isAdmin = sessionStorage.getItem('isAdminAuth') === 'true';
