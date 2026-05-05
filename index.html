@@ -4,32 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EUTIERS</title>
-    <!-- Prevent search engines from indexing the site -->
     <meta name="robots" content="noindex, nofollow">
-    <!-- Connect Inter bold font as in the original -->
     <link href="https://googleapis.com" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- ВЕРХНЯЯ ПАНЕЛЬ С ЛОГОТИПОМ -->
     <div class="top-header">
         <div class="logo">EUTIERS</div>
     </div>
 
-    <!-- NAVIGATION (MODES) -->
-    <div class="nav-container" id="modesNav">
-        <!-- Mode buttons are generated via JS -->
-    </div>
+    <div class="nav-container" id="modesNav"></div>
 
-    <!-- MAIN CONTENT -->
     <div class="container">
         <div class="header-row">
             <h1 id="tier-header-title">ALL TIERS</h1>
             <input type="text" id="searchBar" placeholder="Search player...">
         </div>
 
-        <!-- LEADERBOARD -->
         <table>
             <thead>
                 <tr>
@@ -39,13 +31,11 @@
                     <th style="width: 150px;">TIERS</th>
                 </tr>
             </thead>
-            <tbody id="leaderboardBody" class="fade-in">
-                <!-- Player rows are generated via JS -->
-            </tbody>
+            <tbody id="leaderboardBody" class="fade-in"></tbody>
         </table>
     </div>
 
-    <!-- LOGIN MODAL ДЛЯ АДМИНКИ -->
+    <!-- LOGIN MODAL -->
     <div class="modal-overlay" id="loginModal" onclick="closeLoginModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeLoginDirect()">✕</button>
@@ -75,12 +65,12 @@
         <div class="form-group">
             <label>Region:</label>
             <select id="region-select">
-    <option value="EU">EU</option>
-    <option value="NA">NA</option>
-    <option value="AS">AS</option>
-    <option value="AU">AU</option> <!-- Добавлено -->
-    <option value="OC">OC</option> <!-- Добавлено -->
-</select>
+                <option value="EU">EU</option>
+                <option value="NA">NA</option>
+                <option value="AS">AS</option>
+                <option value="AU">AU</option>
+                <option value="OC">OC</option>
+            </select>
         </div>
         <div class="form-group">
             <label>Mode:</label>
@@ -103,42 +93,34 @@
             </select>
         </div>
         <button class="admin-btn" onclick="savePlayer(event)">Save / Update</button>
-        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()">Delete Player</button>
+        <button class="admin-btn delete-btn" onclick="deletePlayerFromAdmin()" style="margin-top: 5px;">Delete Player</button>
+        
+        <!-- НОВАЯ КНОПКА ДЛЯ СОХРАНЕНИЯ ФАЙЛА -->
+        <hr style="border: 0; border-top: 1px solid #334155; margin: 15px 0;">
+        <button class="admin-btn" onclick="downloadJSON()" style="background: #2ecc71;">Download players.json</button>
     </div>
 
     <!-- PROFILE MODAL -->
     <div class="modal-overlay" id="profileModal" onclick="closeModal(event)">
         <div class="modal-card" onclick="event.stopPropagation()">
             <button class="modal-close" onclick="closeModalDirect()">✕</button>
-            
-            <div class="avatar-container">
-                <div id="skin_container"></div>
-            </div>
-
+            <div class="avatar-container"><div id="skin_container"></div></div>
             <div class="modal-nick" id="modalNick">PlayerName</div>
-            
-            <div class="role-wrapper">
-                <div class="modal-role" id="modalRole">Combat Grandmaster</div>
-            </div>
-            
+            <div class="role-wrapper"><div class="modal-role" id="modalRole">Combat Grandmaster</div></div>
             <div class="modal-region" id="modalRegion">Europe</div>
-
             <div class="modal-section-title">POSITION</div>
             <div class="modal-box">
-                <div class="modal-box-left">
-                    <span class="modal-rank-num" id="modalRank">1.</span>
-                </div>
+                <div class="modal-box-left"><span class="modal-rank-num" id="modalRank">1.</span></div>
                 <div class="modal-box-right">
                     <span class="modal-rank-title">🏆 OVERALL</span>
                     <span class="modal-points" id="modalPoints">(0 points)</span>
                 </div>
             </div>
-
             <div class="modal-section-title">TIERS</div>
             <div class="modal-tiers-grid" id="modalTiersGrid"></div>
         </div>
     </div>
 
-    <script src="script.js?v=999444"></script>
+    <script src="script.js"></script>
 </body>
 </html>
