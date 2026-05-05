@@ -11,7 +11,7 @@ const modeIcons = {
 const pointsMapping = { 'HT1': 60, 'LT1': 45, 'HT2': 30, 'LT2': 20, 'HT3': 10, 'LT3': 6, 'HT4': 4, 'LT4': 3, 'HT5': 5, 'LT5': 1, 'NONE': 0 };
 const tierOrder = { 'HT1': 1, 'LT1': 2, 'HT2': 3, 'LT2': 4, 'HT3': 5, 'LT3': 6, 'HT4': 7, 'LT4': 8, 'HT5': 9, 'LT5': 10, 'NONE': 11 };
 
-// --- FIREBASE SYNC (Синхронизация с облаком) ---
+// --- FIREBASE SYNC ---
 if (window.db) {
     window.db.ref('players').on('value', (snapshot) => {
         const data = snapshot.val();
@@ -23,10 +23,10 @@ if (window.db) {
 // --- INITIALIZE UI ---
 const navCont = document.getElementById('modesNav');
 if (navCont) {
-    let html = `<button class="mode-btn active" onclick="switchMode('overall')">🏆<br>Overall</button>`;
+    let html = `<button class="mode-btn active" data-mode="overall" onclick="switchMode('overall')">🏆<br>Overall</button>`;
     modesList.forEach(m => {
         const label = m === 'netherop' ? 'NethOP' : m.charAt(0).toUpperCase() + m.slice(1);
-        html += `<button class="mode-btn" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
+        html += `<button class="mode-btn" data-mode="${m}" onclick="switchMode('${m}')"><img src="${modeIcons[m]}">${label}</button>`;
     });
     navCont.innerHTML = html;
 }
@@ -60,12 +60,12 @@ function tryLogin() {
         isAdmin = true; sessionStorage.setItem('isAdminAuth', 'true');
         closeLoginDirect();
         document.getElementById('adminPanel').style.display = 'block';
-    } else { alert('Wrong Credentials!'); }
+    } else { alert('Wrong password!'); }
 }
 
 function savePlayer(e) {
     e.preventDefault();
-    if (!isAdmin) return;
+    if (!isAdmin || !window.db) return;
     const nick = document.getElementById('nickname').value.trim();
     if (!nick) return;
 
@@ -83,39 +83,12 @@ function savePlayer(e) {
 }
 
 function deletePlayerFromAdmin() {
-    if (!isAdmin) return;
+    if (!isAdmin || !window.db) return;
     const nick = document.getElementById('nickname').value.trim();
     if (nick) window.db.ref('players/' + nick.toLowerCase()).remove();
 }
 
-function logoutAdmin() {
-    isAdmin = false; sessionStorage.removeItem('isAdminAuth');
-    document.getElementById('adminPanel').style.display = 'none';
-}
-
-// --- CORE LOGIC ---
-function calculatePlayerPoints(p) {
-    let total = 0;
-    modesList.forEach(m => total += pointsMapping[p.tiers[m]] || 0);
-    return total;
-}
-
-function getRankTitle(pts) {
-    if (pts >= 400) return 'Combat Grandmaster';
-    if (pts >= 250) return 'Combat Master';
-    if (pts >= 100) return 'Combat Ace';
-    return 'Rookie';
-}
-
-function switchMode(mode) {
-    currentMode = mode;
-    const btns = document.querySelectorAll('.mode-btn');
-    btns.forEach(b => b.classList.remove('active'));
-    if (event) event.currentTarget.classList.add('active');
-    document.getElementById('tier-header-title').textContent = (mode === 'overall') ? 'ALL TIERS' : 'TIER';
-    renderTable();
-}
-
+// --- RENDER LOGIC ---
 function renderTable() {
     const tbody = document.getElementById('leaderboardBody');
     if (!tbody) return;
@@ -135,7 +108,6 @@ function renderTable() {
         const tr = document.createElement('tr');
         const pts = calculatePlayerPoints(p);
         const lower = p.nick.toLowerCase();
-        
         let tiersHTML = currentMode === 'overall' ? 
             `<div class="tiers-row">` + modesList.map(m => p.tiers[m] !== 'NONE' ? `<span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span>` : '').join('') + `</div>` : 
             `<span class="tier-badge ${p.tiers[currentMode]}">${p.tiers[currentMode]}</span>`;
@@ -145,7 +117,41 @@ function renderTable() {
     });
 }
 
-// --- SKIN RENDERING ---
+function calculatePlayerPoints(p) {
+    let t = 0;
+    modesList.forEach(m => t += pointsMapping[p.tiers[m]] || 0);
+    return t;
+}
+
+function getRankTitle(pts) {
+    if (pts >= 400) return 'Combat Grandmaster';
+    if (pts >= 250) return 'Combat Master';
+    return 'Rookie';
+}
+
+function switchMode(mode) {
+    currentMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.toggle('active', b.getAttribute('onclick').includes(mode)));
+    document.getElementById('tier-header-title').textContent = (mode === 'overall') ? 'ALL TIERS' : 'TIER';
+    renderTable();
+}
+
+function openProfile(nick) {
+    const p = players.find(x => x.nick === nick);
+    if (!p) return;
+    const pts = calculatePlayerPoints(p);
+    document.getElementById('modalNick').textContent = p.nick;
+    document.getElementById('modalRole').textContent = getRankTitle(pts);
+    document.getElementById('modalPoints').textContent = `(${pts} points)`;
+    document.getElementById('modalRegion').textContent = p.region || 'EU';
+    
+    const skinC = document.getElementById("skin_container");
+    skinC.innerHTML = ''; drawSkinToCanvas(p.nick.toLowerCase() + '.png', skinC);
+
+    const m = document.getElementById('profileModal');
+    m.style.display = 'flex'; setTimeout(() => m.classList.add('active'), 10);
+}
+
 function drawSkinToCanvas(imgSource, container) {
     const canvas = document.createElement('canvas');
     canvas.width = 16; canvas.height = 32;
@@ -156,43 +162,11 @@ function drawSkinToCanvas(imgSource, container) {
     const img = new Image();
     img.src = imgSource;
     img.onload = () => {
-        ctx.imageSmoothingEnabled = false;
         ctx.drawImage(img, 8, 8, 8, 8, 4, 0, 8, 8); // Head
         ctx.drawImage(img, 20, 20, 8, 12, 4, 8, 8, 12); // Body
-        ctx.drawImage(img, 44, 20, 4, 12, 0, 8, 4, 12); // L Arm
-        ctx.drawImage(img, 36, 52, 4, 12, 12, 8, 4, 12); // R Arm
-        ctx.drawImage(img, 4, 20, 4, 12, 4, 20, 4, 12); // L Leg
-        ctx.drawImage(img, 20, 52, 4, 12, 8, 20, 4, 12); // R Leg
         container.appendChild(canvas);
     };
     img.onerror = () => { if (imgSource !== 'steve.png') drawSkinToCanvas('steve.png', container); };
-}
-
-function openProfile(nick) {
-    const p = players.find(x => x.nick === nick);
-    if (!p) return;
-    const pts = calculatePlayerPoints(p);
-    const sorted = [...players].sort((a,b) => calculatePlayerPoints(b) - calculatePlayerPoints(a));
-
-    document.getElementById('modalNick').textContent = p.nick;
-    document.getElementById('modalRole').textContent = getRankTitle(pts);
-    document.getElementById('modalRank').textContent = (sorted.findIndex(x => x.nick === nick) + 1) + '.';
-    document.getElementById('modalPoints').textContent = `(${pts} points)`;
-    document.getElementById('modalRegion').textContent = p.region || 'EU';
-    
-    const skinC = document.getElementById("skin_container");
-    skinC.innerHTML = ''; drawSkinToCanvas(p.nick.toLowerCase() + '.png', skinC);
-
-    const grid = document.getElementById('modalTiersGrid');
-    grid.innerHTML = '';
-    modesList.forEach(m => {
-        if (p.tiers[m] !== 'NONE') {
-            grid.innerHTML += `<div class="modal-tier-item"><img src="${modeIcons[m]}" width="14"><span class="tier-badge ${p.tiers[m]}">${p.tiers[m]}</span></div>`;
-        }
-    });
-    
-    const m = document.getElementById('profileModal');
-    m.style.display = 'flex'; setTimeout(() => m.classList.add('active'), 10);
 }
 
 function closeLoginDirect() {
