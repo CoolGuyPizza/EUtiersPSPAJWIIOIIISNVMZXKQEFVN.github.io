@@ -188,13 +188,16 @@ td:last-child { border-radius: 0 10px 10px 0; }
     border-radius: 4px;
     image-rendering: pixelated;
     flex-shrink: 0;
-    /* Увеличиваем скин в 8 раз (800%) */
-    background-size: 800% 800%, 800% 800%; 
-    /* Позиции: первая для шлема (40,8), вторая для лица (8,8) */
-    background-position: 93.75% 12.5%, 12.5% 12.5%; 
     background-repeat: no-repeat;
     background-color: #1e293b;
     border: 1px solid rgba(255,255,255,0.1);
+    
+    /* Принудительно ставим размер 256px (это 32px * 8 частей скина) */
+    background-size: 256px 256px, 256px 256px; 
+    
+    /* Слой 1 (Шлем) и Слой 2 (Лицо) */
+    /* Вырезаем нужные квадраты 32x32px из общего полотна */
+    background-position: -160px -32px, -32px -32px;
 }
 
 .player-cell {
